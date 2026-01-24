@@ -1,0 +1,458 @@
+---
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup06}
+#| include: false
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, comment = "")
+options(scipen=999)
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+# Коэффициент Байеса
+
+## Формула Байеса опять
+
+$$P(\theta|Data) = \frac{P(Data|\theta) \times  P(\theta) }{P(Data)}$$
+
+Рассмотрим какой-то простой случай, который мы уже видели много раз.
+
+::: {.callout-note}
+Немного упрощая данные из статьи [@rosenbach03: 394], можно сказать что носители британского английского предпочитают *s*-генитив (90%) *of*-генитиву (10%). Проведите байесовский апдейт, если Вы наблюдаете в интервью британского актера из 120 контекстов 92 *s*-генитивов. Априорное распределение берите соразмерное данным.
+:::
+
+Если мы не будем следовать простой дорожкой, которую мы обсуждали несколько разделов назад, а будем все делать согласно формуле Байеса, то получатся следующие компоненты:
+
+- априорное распределение
+```{r}
+tibble(x = seq(0, 1, 0.001),
+       prior = dbeta(x = x, shape1 = 120*0.9, shape2 = 120*0.1)) |> 
+  ggplot(aes(x, prior))+
+  geom_line(color = "red")
+```
+
+- функция правдоподобия
+```{r}
+tibble(x = seq(0, 1, 0.001),
+       likelihood = dbinom(x = 92, size = 120, prob = x)) |> 
+  ggplot(aes(x, likelihood))+
+  geom_line()
+```
+
+- их произведение (пропорционально апостериорному распределению)
+
+```{r}
+tibble(x = seq(0, 1, 0.001),
+       prior = dbeta(x = x, shape1 = 120*0.9, shape2 = 120*0.1),
+       likelihood = dbinom(x = 92, size = 120, prob = x),
+       product = prior*likelihood) |> 
+  ggplot(aes(x, product))+
+  geom_line()
+```
+
+- предельное правдоподобие, которое позволяет сделать получившееся распределение распределением вероятностей
+
+```{r}
+marginal_likelihood <- integrate(function(p){
+  dbinom(92, 120, p) * dbeta(p, 120*0.9, 120*0.1)}, 
+  lower = 0, 
+  upper = 1)
+marginal_likelihood
+```
+
+- ... и в результате получается апостериорное распределение!
+
+```{r}
+tibble(x = seq(0, 1, 0.001),
+       prior = dbeta(x = x, shape1 = 120*0.9, shape2 = 120*0.1),
+       likelihood = dbinom(x = 92, size = 120, prob = x),
+       product = prior*likelihood,
+       posterior = product/marginal_likelihood[[1]]) |> 
+  ggplot(aes(x, posterior))+
+  geom_line(color = "darkgreen")+
+  geom_line(aes(y = prior), color = "red")
+```
+
+... которое мы умеем доставать и быстрее:
+
+```{r}
+tibble(x = seq(0, 1, 0.001),
+       prior = dbeta(x = x, shape1 = 120*0.9, shape2 = 120*0.1),
+       likelihood = dbinom(x = 92, size = 120, prob = x),
+       product = prior*likelihood,
+       posterior = product/marginal_likelihood[[1]],
+       posterior_2 = dbeta(x = x, shape1 = 120*0.9+92, shape2 = 120*0.1+120-92)) |> 
+  ggplot(aes(x, posterior))+
+  geom_line(color = "darkgreen", size = 2)+
+  geom_line(aes(y = prior), color = "red")+
+  geom_line(aes(y = posterior_2), linetype = 2, color = "yellow")
+```
+
+Представим себе, что у нас есть $k$ гипотез $M$. Тогда формула Байеса может выглядеть вот так:
+
+$$P(M_k|Data) = \frac{P(Data|M_k) \times  P(M_k) }{P(Data)}$$
+В данном занятии мы рассмотрим только случай двух модели, но можно рассматривать и случаи, когда моделей много. Посмотрим на соотношение апостериорных распределений двух моделей:
+
+$$\underbrace{\frac{P(M_1 \mid Data)}{P(M_2 \mid Data)}}_{\text{posterior odds}} = \frac{\frac{P(Data|M_1) \times  P(M_1) }{P(Data)}}{\frac{P(Data|M_2) \times  P(M_2) }{P(Data)}}=\underbrace{\frac{P(Data \mid M_1)}{P(Data \mid M_2)}}_{\text{Bayes factor}}\times\underbrace{\frac{P(M_1)}{P(M_2)}}_{\text{prior odds}}$$
+
+Таким образом байесовский коэффициент это соотношение апосториорных распределений деленное на соотношение априорных распределений.
+
+$$BF_{12}= \frac{P(M_1 \mid Data)/P(M_2 \mid Data)}{P(M_1)/P(M_2)}=\frac{P(M_1 \mid Data)\times P(M_2)}{P(M_2 \mid Data)\times P(M_1)}$$
+
+В результате получается, что коэффициент Байеса --- это соотношение предельных правдоподобий (знаменатель теоремы Байеса):
+
+
+$$BF_{12}= \frac{P(Data|\theta, M_1))}{P(Data|\theta, M_2))}=\frac{\int P(Data|\theta, M_1)\times P(\theta|M_1)}{\int P(Data|\theta, M_2)\times P(\theta|M_2)}$$
+
+Важно заметить, что если вероятности априорных моделей равны, то байесовский коэффициент равен просто соотношению функций правдоподобия. 
+
+Надо отметить, что не все тепло относятся к сравнению моделей байесовским коэффициентом (см. [@gelman1995]).
+
+## Категориальные данные
+
+Для примера обратимся снова к датасету, который содержит спамерские и обычные смс-сообщения, выложенному UCI Machine Learning [на kaggle](https://www.kaggle.com/uciml/sms-spam-collection-dataset), и при помощи пакета `udpipe` токенизируем и определим часть речи:
+
+```{r}
+#| fig-width: 9
+#| fig-height: 7
+sms_pos <- read_csv("https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/master/data/spam_sms_pos.csv")
+glimpse(sms_pos)
+sms_pos |> 
+  group_by(type) |> 
+  mutate(ratio = n/sum(n),
+         upos = fct_reorder(upos, n, mean, .desc = TRUE)) |>
+  ggplot(aes(type, ratio))+
+  geom_col()+
+  geom_label(aes(label = round(ratio, 3)), position = position_stack(vjust = 0.5))+
+  facet_wrap(~upos, scales = "free_y")
+```
+
+Давайте полученные доли считать нашей моделью: сумма всех чисел внутри каждого типа (`ham`/`spam`) дает в сумме 1. Мы получили новое сообщение: 
+
+> Call FREEPHONE 0800 542 0825 now! 
+
+Модель `udpipe` разобрала его следующим образом: 
+
+> VERB NUM NUM NUM NUM ADV PUNCT 
+
+Если мы считаем наши модели равновероятными:
+
+```{r}
+first_update <- tibble(model = c("ham", "spam"),
+                       prior = 0.5,
+                       likelihood = c(0.135, 0.096),
+                       product = prior*likelihood,
+                       marginal_likelihood = sum(product),
+                       posterior = product/marginal_likelihood)
+first_update
+```
+
+Если же мы примем во внимание, что наши классы не равноправны, то сможем посчитать это нашим априорным распределением для моделей.
+```{r}
+sms_pos |> 
+  uncount(n) |> 
+  count(type) |> 
+  mutate(ratio = n/sum(n)) ->
+  class_ratio
+class_ratio
+
+second_update <- tibble(model = c("ham", "spam"),
+                        prior = class_ratio$ratio,
+                        likelihood = c(0.135, 0.096),
+                        product = prior*likelihood,
+                        marginal_likelihood = sum(product),
+                        posterior = product/marginal_likelihood)
+second_update
+
+# Bayes factor
+second_update$marginal_likelihood[1]/first_update$marginal_likelihood[1]
+```
+
+## [Интерпретация коэфициента Байеса](https://en.wikipedia.org/wiki/Bayes_factor#Interpretation)
+
+## Биномиальные данные
+
+Рассмотрим простенькую задачу, которую мы видели раньше:
+
+::: {.callout-note}
+Немного упрощая данные из статьи [@rosenbach03: 394], можно сказать что носители британского английского предпочитают *s*-генитив (90%) *of*-генитиву (10%), а носители американского английского предпочитают *s*-генитив (85%) *of*-генитиву (15%). Мы наблюдаем актера, который в интервью из 120 контекстов использует в 92 случаях *s*-генитивы. Сравните модели при помощи байесовского коэффициента.
+:::
+
+```{r}
+tibble(x = seq(0, 1, by = 0.001),
+       y = dbeta(x, 120*0.9, 120*0.1),
+       z = dbeta(x, 120*0.85, 120*0.15)) |> 
+  ggplot(aes(x, y))+
+  geom_line(color = "red")+
+  geom_line(aes(y = z), color = "lightblue")+
+  geom_vline(xintercept = 92/120, linetype = 2)
+
+m1 <- function(p) dbinom(92, 120, p) * dbeta(p, 120*0.9, 120*0.1)
+m2 <- function(p) dbinom(92, 120, p) * dbeta(p, 120*0.85, 120*0.15)
+
+integrate(m1, 0, 1)[[1]]/integrate(m2, 0, 1)[[1]]
+```
+
+::: {.callout-note}
+В работе [@coretta2016] собраны [данные](https://raw.githubusercontent.com/agricolamz/2022_da4l/master/data/Coretta_2017_icelandic.csv) длительности исландских гласных (столбец `vowel.dur`). Отфильтруйте данные, произнесенные носителем `tt01` (переменная `speaker`), посчитайте байесовский коэффициент ($B_{12}$) для двух априорных моделей:
+
+- нормального распределения со средним 87 и стандартным отклонением 25. ($m_1$)
+- нормального распределения со средним 85 и стандартным отклонением 30. ($m_2$)
+
+Ответ округлите до трёх или менее знаков после запятой.
+:::
+
+```{r}
+#| echo: false
+read_csv("https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/master/data/Coretta_2017_icelandic.csv") |> 
+  filter(speaker == "tt01") ->
+  vowels
+
+m1 <- function(x) dnorm(x, 87, 25) * dnorm(x, 
+                                           mean(vowels$vowel.dur),
+                                           sd(vowels$vowel.dur))
+m2 <- function(x) dnorm(x, 85, 30) * dnorm(x, 
+                                           mean(vowels$vowel.dur),
+                                           sd(vowels$vowel.dur))
+
+library(checkdown)
+(integrate(m1, -Inf, Inf)[[1]]/integrate(m2, -Inf, Inf)[[1]]) |> 
+  round(digits = 3) |> 
+  check_question(placeholder = "1.234")
+```
+
+## Сравнение точечных и интервальных моделей (основано на [@etz18])
+
+До этого момента, когда мы говорили о сравнении биномиальных данных, мы обычно говорили о поиске и описании параметра *p* бета и биномиального распределений --- которая в свою очередь представляет отражает нашу точечную оценку моделируемого процесса. Например, если мы пытаемся моделировать род слова (например, *кофе*), мы можем представить это в виде трех гипотез: слово относится к одному роду, к другому роду или существует вариативность:
+
+```{r}
+#| echo: false
+
+x_axis <- seq(0, 1, 0.001)
+
+tibble(x = rep(x_axis, 3),
+       y = c(5*(x_axis == 0),
+             5*(x_axis == 1),
+             5*(x_axis == 0.5)),
+       type = rep(c("род 1, θ = 0", "род 2, θ = 1", "вариативность, θ = 0.5"),
+                  each = 1001)) %>% 
+  ggplot(aes(x, y, xend = x, yend = 0.1, color = type, linetype = type))+
+  geom_step(linewidth = 1.2)+
+  labs(x = "вероятность", y = NULL, color = NULL, linetype = NULL)+
+  theme(legend.position = "bottom")
+```
+
+В большинстве случаев нас интересует не все три варианта, а лишь два: слово четко характеризуется некоторым родом или же мы наблюдаем вариативность. Если же вдруг в реальности вы видите третий вариант --- значит вы недостаточно подготовились к моделированию и строить гипотезы было рано.
+
+```{r}
+#| echo: false
+
+tibble(x = rep(x_axis, 2),
+           y = c(5*(x_axis == 1),
+                 5*(x_axis == 0.5)),
+           type = rep(c("некоторый род X, θ = 1", "вариативность, θ = 0.5"),each = 1001)) %>% 
+  ggplot(aes(x, y, xend = x, yend = 0.1, color = type, linetype = type))+
+  geom_step(linewidth = 1.2)+
+  labs(x = "вероятность", y = NULL, color = NULL, linetype = NULL)+
+  theme(legend.position = "bottom")
+```
+
+Представим в ходе эксперимента мы опросили 16 носителей. В таком случае мы можем описать предсказания модели при помощи двух биномиальных распределений:
+
+```{r}
+#| echo: false
+
+tibble(x = rep(1:16, 2),
+       y = c(-dbinom(1:16, 16, prob = 0.5),
+             dbinom(1:16, 16, prob = 1)),
+       type = rep(c("вариативность, θ = 0.5", "некоторый род X, θ = 1"),
+                  each = 16)) %>% 
+  ggplot(aes(x, y, fill = type))+
+  geom_col()+
+  labs(x = "предсказанное количество употреблений рода Х",
+       y = "вероятность", fill = NULL)+
+  scale_x_continuous(breaks = 1:16)+
+  scale_y_continuous(breaks = seq(-0.25, 1, 0.25), 
+                     labels = abs(seq(-0.25, 1, 0.25)))+
+  theme(legend.position = "bottom")
+```
+
+Наш классификатор получился слишком строгий: либо все говорят слово в роде X, либо вариативность. Для того, чтобы допустить хоть какие-то поблажки, давайте ослабим параметр с 1 до 0.96:
+
+```{r}
+#| echo: false
+
+tibble(x = rep(x_axis, 2),
+       y = c(5*(x_axis == 0.96),
+             5*(x_axis == 0.5)),
+       type = rep(c("некоторый род X, θ = 0.96", "вариативность, θ = 0.5"),
+                  each = 1001)) %>% 
+  ggplot(aes(x, y, xend = x, yend = 0.1, color = type, linetype = type))+
+  geom_step(linewidth = 1.2)+
+  labs(x = "вероятность", y = NULL, color = NULL, linetype = NULL)+
+  theme(legend.position = "bottom")
+```
+
+Тогда предсказания модели будет выглядит вот так:
+
+```{r}
+#| echo: false
+
+tibble(x = rep(1:16, 2),
+       y = c(-dbinom(1:16, 16, prob = 0.5),
+             dbinom(1:16, 16, prob = 0.96)),
+       type = rep(c("вариативность, θ = 0.5", "некоторый род X, θ = 0.96"),
+                  each = 16)) %>% 
+  ggplot(aes(x, y, fill = type))+
+  geom_col()+
+  labs(x = "предсказанное количество употреблений рода Х",
+       y = "вероятность", fill = NULL)+
+  scale_x_continuous(breaks = 1:16)+
+  scale_y_continuous(breaks = seq(-0.25, 1, 0.25), 
+                     labels = abs(seq(-0.25, 1, 0.25)))+
+  theme(legend.position = "bottom")
+```
+
+На всякий случай, соотношение высот столбиков --- это фриквентистский вариант байесовского коэффициента, который называется **тест отношения правдоподобия** (likelihood ratio).
+
+```{r}
+#| echo: false
+
+tibble(x = rep(1:16, 2),
+       y = c(-dbinom(1:16, 16, prob = 0.5),
+             dbinom(1:16, 16, prob = 0.96)),
+       type = rep(c("вариативность, θ = 0.5", "некоторый род X, θ = 0.96"),
+                  each = 16)) %>% 
+  ggplot(aes(x, y, fill = type))+
+  geom_col()+
+  labs(x = "предсказанное количество употреблений рода Х",
+       y = "вероятность", fill = NULL)+
+  scale_x_continuous(breaks = 1:16)+
+  scale_y_continuous(breaks = seq(-0.2, 0.4, 0.2), 
+                     labels = abs(seq(-0.2, 0.4, 0.2)))+
+  theme(legend.position = "bottom")+
+  annotate(geom = "text", x = 13, y = -0.05, label = "⬆", size = 10)+
+  annotate(geom = "text", x = 13, y =  0.05, label = "⬇", size = 10)
+```
+
+Основная проблема точечных оценок заключается в том, что они оставляют достаточно много неуверенности в промежуточных значениях. Представим, что у нас не 16 наблюдений, а 90:
+
+```{r}
+#| echo: false
+
+tibble(x = rep(1:90, 2),
+       y = c(-dbinom(1:90, 90, prob = 0.5),
+             dbinom(1:90, 90, prob = 0.96)),
+       type = rep(c("вариативность, θ = 0.5", "некоторый род X, θ = 0.96"),
+                  each = 90)) %>% 
+  ggplot(aes(x, y, fill = type))+
+  geom_col()+
+  labs(x = "предсказанное количество употреблений рода Х",
+       y = "вероятность", fill = NULL)+
+  theme(legend.position = "bottom")
+```
+
+В таком случае наш классификатор достаточно сильно не уверен в значениях между 65 и 75. Альтернативой являются интервальные модели:
+
+```{r}
+#| echo: false
+
+dunifbinom <- function(x, N, lo, hi) {
+  y = x
+  for (i in 1:length(x)) {
+    y[i] = integrate(function(theta) dunif(theta, lo, hi) * dbinom(x[i], N, theta),
+                     0, 1, subdivisions = 10000L,
+                     rel.tol = 1e-4, 
+                     abs.tol = 1e-4,
+                     stop.on.error = TRUE,
+                     keep.xy = FALSE, 
+                     aux = NULL)$value
+  }
+  y
+}
+
+tibble(x = rep(x_axis, 2),
+           y = c(5*(x_axis == 0.5),
+                 dunif(x_axis, 0.5, 1)),
+           type = rep(c("вариативность, θ = 0.5", "некоторый род X, θ = u(0.5, 1)"),each = 1001)) |>
+  ggplot(aes(x, y, xend = x, yend = 0.1, color = type, linetype = type))+
+  geom_step(linewidth = 1.2)+
+  labs(x = "вероятность",
+       y = NULL)+
+  labs(x = "предсказанное количество употреблений рода Х",
+       y = "вероятность", color = NULL, linetype = NULL)+
+  theme(legend.position = "bottom")
+
+tibble(x = rep(1:16, 2),
+           y = c(-dbinom(1:16, 16, prob = 0.5),
+                 dunifbinom(x = 1:16, 16, 0.5, 1)),
+           type = rep(c("вариативность, θ = 0.5", "некоторый род X, θ = u(0.5, 1)"),each = 16)) |>
+  ggplot(aes(x, y, fill = type))+
+  geom_col()+
+  labs(x = "предсказанное количество употреблений рода Х",
+       y = "вероятность", fill = NULL)+
+  theme(legend.position = "bottom")+
+  scale_x_continuous(breaks = 1:16)
+```
+
+Или вот еще возможные комбинации:
+
+```{r}
+#| echo: false
+
+tibble(x = rep(1:16, 2),
+           y = c(-dbinom(1:16, 16, prob = 0.5),
+                 dbinom(1:16, 16, prob = 0.7)),
+           type = rep(c("θ = 0.5", "θ = 0.7"),each = 16)) %>% 
+  ggplot(aes(x, y, fill = type))+
+  geom_col()+
+  labs(title = "two point hypotheses",
+       x = "предсказанное количество употреблений рода Х",
+       y = "вероятность", 
+       fill = NULL)+
+  theme(legend.position = "bottom")+
+  scale_x_continuous(breaks = 1:16) -> p1
+
+tibble(x = rep(1:16, 2),
+           y = c(-dbinom(1:16, 16, prob = 0.5),
+                 dunifbinom(x = 1:16, 16, 0, 1)),
+           type = rep(c("θ = 0.5", "θ = u(θ|0, 1)"),each = 16)) %>% 
+  ggplot(aes(x, y, fill = type))+
+  geom_col()+
+  labs(title = "point and unimodal",
+       x = "предсказанное количество употреблений рода Х",
+       y = "вероятность", 
+       fill = NULL)+
+  theme(legend.position = "bottom")+
+  scale_x_continuous(breaks = 1:16) -> p2
+
+tibble(x = rep(1:16, 2),
+           y = c(-dunifbinom(x = 1:16, 16, 0, 1),
+                 dunifbinom(x = 1:16, 16, 0.5, 1)),
+           type = rep(c("θ = u(θ|0, 1)", "θ = u(θ|0.5, 1)"),each = 16)) %>% 
+  ggplot(aes(x, y, fill = type))+
+  geom_col()+
+  labs(title = "",
+       x = "предсказанное количество употреблений рода Х",
+       y = "вероятность", 
+       fill = NULL)+
+  theme(legend.position = "bottom")+
+  scale_x_continuous(breaks = 1:16) -> p3
+
+tibble(x = rep(1:16, 2),
+           y = c(-dunifbinom(x = 1:16, 16, 0, 0.5),
+                 dunifbinom(x = 1:16, 16, 0.5, 1)),
+           type = rep(c("θ = u(θ|0, 0.5)", "θ = u(θ|0.5, 1)"),each = 16)) %>% 
+  ggplot(aes(x, y, fill = type))+
+  geom_col()+
+  labs(title = "complementary directions",
+       x = "предсказанное количество употреблений рода Х",
+       y = "вероятность", 
+       fill = NULL)+
+  theme(legend.position = "bottom")+
+  scale_x_continuous(breaks = 1:16) -> p4
+
+gridExtra::grid.arrange(p1, p2, p3, p4)
+```

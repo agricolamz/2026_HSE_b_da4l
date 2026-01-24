@@ -1,0 +1,20 @@
+language,tone,long_vowels,stress,ejectives,consonants,vowels,area
+Turkish,FALSE,TRUE,TRUE,FALSE,25,8,Eurasia
+Korean,FALSE,FALSE,TRUE,FALSE,21,11,Eurasia
+Tiwi,FALSE,FALSE,TRUE,FALSE,22,4,Australia
+Liberia Kpelle,TRUE,FALSE,FALSE,FALSE,22,12,Africa
+Tulu,FALSE,TRUE,FALSE,FALSE,24,13,Eurasia
+Mapudungun,FALSE,FALSE,TRUE,FALSE,20,6,South America
+Kiowa,TRUE,TRUE,FALSE,FALSE,22,20,North America
+Paraguayan Guaraní,FALSE,FALSE,TRUE,FALSE,24,12,South America
+Japanese,TRUE,TRUE,TRUE,FALSE,15,5,Eurasia
+Yoruba,TRUE,FALSE,FALSE,FALSE,18,11,Africa
+Finnish,FALSE,TRUE,TRUE,FALSE,17,8,Eurasia
+Hawaiian,FALSE,TRUE,TRUE,FALSE,8,5,Papunesia
+Hungarian,FALSE,TRUE,TRUE,FALSE,26,14,Eurasia
+Georgian,FALSE,FALSE,TRUE,TRUE,28,6,Eurasia
+Amharic,FALSE,FALSE,TRUE,TRUE,30,7,Africa
+Sandawe,TRUE,TRUE,FALSE,TRUE,47,7,Africa
+Tlingit,TRUE,TRUE,FALSE,TRUE,43,5,North America
+Lakota,FALSE,FALSE,TRUE,TRUE,28,8,North America
+Yucatec Maya,TRUE,TRUE,FALSE,TRUE,20,10,North America

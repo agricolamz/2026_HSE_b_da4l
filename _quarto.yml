@@ -1,0 +1,31 @@
+project:
+  type: book
+  output-dir: docs
+  
+book:
+  title: "daR4hs"
+  author: "Г. А. Мороз"
+  repo-url: https://github.com/agricolamz/2026_HSE_b_da4l/
+  chapters:
+    - index.qmd
+    - 01-distributions.qmd
+    - 02-likelihood.qmd
+    - 03-mixture-models.qmd
+    - 04-intro-to-Bayes.qmd
+    - 05-confidence-intervals.qmd
+    - 06-Bayes-factor.qmd
+    - 07-Empirical-Bayes.qmd
+    - 08-a-b-testing.qmd
+    - 09-Introduction-to-MCMC.qmd
+    - 10-advanced-regression.qmd    
+    - 11-introduction_to_bayesian_regression_with_brms.qmd
+    - 12-introduction_to_logistic.qmd
+    
+callout-appearance: simple
+callout-icon: false
+bibliography: bibliography.bib
+
+format:
+  html:
+    theme: cosmo
+    df-print: paged

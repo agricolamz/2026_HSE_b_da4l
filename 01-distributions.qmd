@@ -1,0 +1,359 @@
+---
+title: Распределения
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r setup01}
+#| include: false
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, comment = "")
+options(scipen=999)
+library(tidyverse)
+theme_set(theme_bw())
+library(checkdown)
+```
+
+```{r}
+library(tidyverse)
+```
+
+## Распределения в R
+
+В R встроено какое-то количество известных распределений. Все они представлены четырьмя функциями: 
+
+* `d...` (функция плотности, probability density function),
+* `p...` (функция распределения, cumulative distribution function) --- интеграл площади под кривой от начала до указанной квантили
+* `q...` (обратная функции распределения, inverse cumulative distribution function) --- значение *p*-той квантили распределения
+* и `r...` (рандомные числа из заданного распределения).
+
+Рассмотрим все это на примере нормального распределения.
+
+```{r}
+tibble(x = 1:100,
+       PDF = dnorm(x = x, mean = 50, sd = 10)) |> 
+  ggplot(aes(x, PDF))+
+  geom_point()+
+  geom_line()+
+  labs(title = "PDF нормального распределения (μ = 50, sd = 10)")
+
+tibble(x = 1:100,
+       CDF = pnorm(x, mean = 50, sd = 10)) |> 
+  ggplot(aes(x, CDF))+
+  geom_point()+
+  geom_line()+
+  labs(title = "CDF нормального распределения (μ = 50, sd = 10)")
+
+tibble(quantiles = seq(0, 1, by = 0.01),
+       value = qnorm(quantiles, mean = 50, sd = 10)) |> 
+  ggplot(aes(quantiles, value))+
+  geom_point()+
+  geom_line()+
+  labs(title = "inverse CDF нормального распределения (μ = 50, sd = 10)")
+
+tibble(sample = rnorm(100, mean = 50, sd = 10)) |> 
+  ggplot(aes(sample))+
+  geom_histogram()+
+  labs(title = "выборка нормально распределенных чисел (μ = 50, sd = 10)")
+```
+
+Если не использовать `set.seed()`, то результат работы рандомизатора нельзя будет повторить.
+
+::: {.callout-note}
+Какое значение имеет 25% квантиль нормального распределения со средним в 20 и стандартным отклонением 90? Ответ округлите до трех знаков после запятой.
+:::
+
+```{r}
+#| echo: false
+
+qnorm(0.25, mean = 20, sd = 90) |> 
+  round(3) |> 
+  check_question(placeholder = "-12.345")
+```
+
+::: {.callout-note}
+Данные из базы данных фонетических инвентарей PHOIBLE [@phoible], достаточно сильно упрощая, можно описать нормальным распределением со средним 35 фонем и стандартным отклонением 13. Если мы ничего не знаем про язык, оцените с какой вероятностью, согласно этой модели произвольно взятый язык окажется в промежутке между 25 и 50 фонемами? Ответ округлите до трех знаков после запятой.
+:::
+
+```{r}
+#| echo: false
+
+round(pnorm(50, 35, 13) - pnorm(25, 35, 13), 3) |>
+  check_question(placeholder = "0.123")
+```
+
+::: {.callout-note}
+Какие есть недостатки у модели из предыдущего задания?
+:::
+
+```{r}
+#| echo: false
+
+check_hints(list_title = "ответы:",
+            hint_text = c("Согласно данной модели, количество фонем в языках может принимать значение равное любому действительному числу, в то время как в данных мы наблюдаем только целые числа.",
+                          paste0("Данная модель предсказывает, что количество фонем ",
+                                 round(pnorm(0, 35, 13)*100, 1),
+                                 "% языков  меньше нуля, что представляется невозможным с точки зрения лингвистики.")),
+            hint_title = paste0("недостаток ", 1:2))
+```
+
+
+## Дискретные переменные
+### Биномиальное распределение
+
+Биномиальное распределение --- распределение количетсва успехов эксперементов Бернулли из *n* попыток с вероятностью успеха *p*.
+
+$$P(k | n, p) = \frac{n!}{k!(n-k)!} \times p^k \times (1-p)^{n-k} =  {n \choose k} \times p^k \times (1-p)^{n-k}$$ 
+$$ 0 \leq p \leq 1; n, k > 0$$
+
+```{r}
+tibble(x = 0:50,
+       density = dbinom(x = x, size = 50, prob = 0.16)) |> 
+  ggplot(aes(x, density))+
+  geom_point()+
+  geom_line()+
+  labs(title = "Биномиальное распределение p = 0.16, n = 50")
+```
+
+::: {.callout-note}
+Немного упрощая данные из статьи [@rosenbach03: 394], можно сказать что носители британского английского предпочитают *s*-генитив (90%) *of*-генитиву (10%). Какова вероятность, согласно этим данным, что в интервью британского актера из 118 контекстов будет 102 *s*-генитивов? Ответ округлите до трёх ИЛИ МЕНЕЕ знаков после запятой.
+:::
+
+```{r}
+#| echo: false
+
+round(dbinom(x = 102, size = 118, prob = 0.9), 3) |> 
+  check_question(placeholder = "0.123")
+```
+
+::: {.callout-note}
+А какое значение количества *s*-генитивов наиболее ожидаемо, согласно этой модели?
+:::
+
+```{r}
+#| echo: false
+
+round(dbinom(x = 1:118, size = 118, prob = 0.9), 3) |> 
+  which.max() |> 
+  check_question()
+```
+
+
+### Геометрическое распределение
+
+Геометрическое распределение --- распределение количетсва эксперементов Бернулли с вероятностью успеха *p* до первого успеха.
+
+$$P(k | p) = (1-p)^k\times p$$
+$$k\in\{1, 2, \dots\}$$
+
+```{r}
+tibble(x = 0:50,
+       density = dgeom(x = x, prob = 0.16)) |> 
+  ggplot(aes(x, density))+
+  geom_point()+
+  geom_line()+
+  labs(title = "Геометрическое распределение p = 0.16, n = 50")
+```
+
+::: {.callout-note}
+Приняв модель из [@rosenbach03: 394], какова вероятность, что в интервью с британским актером первый *of*-генитив будет третьим по счету? 
+:::
+
+```{r}
+#| echo: false
+round(dgeom(x = 3-1, prob = 0.1), 3) |> 
+  check_question(placeholder = "0.123")
+```
+
+### Распределение Пуассона
+
+Распределение дискретной переменной, обозначающей количество случаев $k$ некоторого события, которое происходит с некоторой заданной частотой $\lambda$.
+
+$$P(\lambda) = \frac{e^{-\lambda}\times\lambda^k}{k!}$$
+
+```{r}
+tibble(k = 0:50,
+       density = dpois(x = k, lambda = 5)) |> 
+  ggplot(aes(k, density))+
+  geom_point()+
+  geom_line()+
+  labs(title = "Распределение Пуассона с параметром λ = 5")
+```
+
+Параметр $\lambda$ в модели Пуассона одновременно является и средним, и дисперсией.
+
+Попробуем воспользоваться распределением Пуассона для моделирования количества слогов в андийском языке. Количество слогов -- это всегда натуральное число (т. е. не бывает 2.5 слогов, не бывает -3 слогов и т. д., но в теории может быть 0 слогов), так что модель Пуассона здесь применима. Согласно модели Пуассона все слова независимо друг от друга получают сколько-то слогов согласно распределению Пуассона. Посмотрим на данные:
+
+```{r}
+andic_syllables <- read_csv("https://raw.githubusercontent.com/agricolamz/2021_da4l/master/data/andic_syllables.csv") 
+
+andic_syllables |> 
+  ggplot(aes(n_syllables, count))+
+  geom_col()+
+  facet_wrap(~language, scales = "free")
+```
+
+
+```{r}
+#| include: false
+
+andic_syllables |> 
+  filter(language == "Andi") |> 
+  uncount(count) |> 
+  summarise(est = fitdistrplus::fitdist(n_syllables, distr = 'pois', method = 'mle')$estimate) |> 
+  pull() |> 
+  round(3) ->
+  est_lambda
+```
+
+Птичка напела (мы научимся узнавать, откуда птичка это знает на следующем занятии), что андийские данные можно описать при помощи распределения Пуассона с параметром $\lambda$ = `r est_lambda`.
+
+```{r}
+andic_syllables |> 
+  filter(language == "Andi") |> 
+  rename(observed = count) |> 
+  mutate(predicted = dpois(n_syllables, lambda = 2.783)*sum(observed)) |> 
+  pivot_longer(names_to = "type", values_to = "value", cols = c(observed, predicted)) |> 
+  ggplot(aes(n_syllables, value, fill = type))+
+  geom_col(position = "dodge")
+```
+
+::: {.callout-note}
+На графиках ниже представлены предсказания трех Пуассоновских моделей, какая кажется лучше?
+:::
+
+```{r}
+#| echo: false
+#| fig-height: 8
+
+andic_syllables |> 
+  filter(language == "Bagvalal") |> 
+  rename(observed = count) |> 
+  mutate(predicted = dpois(n_syllables, lambda = 1.452)*sum(observed)) |> 
+  pivot_longer(names_to = "type", values_to = "value", cols = c(observed, predicted)) |> 
+  ggplot(aes(n_syllables, value, fill = type))+
+  geom_col(position = "dodge")+
+  labs(title = "Багвалинские данные, λ = 1.452",
+       y = "",
+       x = "количество слогов") ->
+  p1
+
+andic_syllables |> 
+  filter(language == "Bagvalal") |> 
+  rename(observed = count) |> 
+  mutate(predicted = dpois(n_syllables, lambda = 2.452)*sum(observed)) |> 
+  pivot_longer(names_to = "type", values_to = "value", cols = c(observed, predicted)) |> 
+  ggplot(aes(n_syllables, value, fill = type))+
+  geom_col(position = "dodge")+
+  labs(title = "Багвалинские данные, λ = 2.452",
+       y = "",
+       x = "количество слогов")->
+  p2
+
+andic_syllables |> 
+  filter(language == "Bagvalal") |> 
+  rename(observed = count) |> 
+  mutate(predicted = dpois(n_syllables, lambda = 3.452)*sum(observed)) |> 
+  pivot_longer(names_to = "type", values_to = "value", cols = c(observed, predicted)) |> 
+  ggplot(aes(n_syllables, value, fill = type))+
+  geom_col(position = "dodge")+
+  labs(title = "Багвалинские данные, λ = 3.452",
+       y = "",
+       x = "количество слогов")->
+  p3
+
+plot(gridExtra::arrangeGrob(p1, p2, p3))
+```
+
+::: {.callout-note}
+Выше было написано:
+
+> Согласно модели Пуассона все слова **независимо друг от друга** получают сколько-то слогов согласно распределению Пуассона.
+
+Какие проблемы есть у предположения о независимости друг от друга количества слогов разных слов в словаре?
+:::
+
+## Числовые переменные
+### Нормальное распределение
+
+$$P(x) = \frac{1}{\sigma\sqrt{2\pi}}\times e^{-\frac{\left(x-\mu\right)^2}{2\sigma^2}}$$
+
+$$\mu \in \mathbb{R}; \sigma^2 > 0$$
+
+```{r}
+tibble(x = 1:100,
+       PDF = dnorm(x = x, mean = 50, sd = 10)) |> 
+  ggplot(aes(x, PDF))+
+  geom_point()+
+  geom_line()+
+  labs(title = "PDF нормального распределения (μ = 50, sd = 10)")
+```
+
+```{r}
+#| include: false
+
+vowels <- read_csv("https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/main/data/phonTools_hillenbrand_1995.csv") 
+
+vowels |> 
+  summarise(est = fitdistrplus::fitdist(dur, distr = 'norm', method = 'mle')$estimate) |> 
+  pull() |> 
+  round(3)->
+  est_m_sd
+```
+
+Птичка напела, что длительность гласных американского английского из [@hillenbrand95] можно описать нормальным распределением с параметрами $\mu =$ `r est_m_sd[1]` и $\sigma =$ `r est_m_sd[2]`. Посмотрим, как можно совместить данные и это распределение:
+
+```{r}
+vowels <- read_csv("https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/main/data/phonTools_hillenbrand_1995.csv") 
+vowels |> 
+  ggplot(aes(dur)) + 
+  geom_histogram(aes(y = after_stat(density))) + # обратите внимание на аргумент after_stat(density)
+  stat_function(fun = dnorm, args = list(mean = 274.673, sd = 64.482), color = "red")
+```
+
+### Логнормальное распределение
+
+$$P(x) = \frac{1}{\sqrt{x\sigma2\pi}}\times e^{-\frac{\left(\ln(x)-\mu\right)^2}{2\sigma^2}}$$
+
+$$\mu \in \mathbb{R}; \sigma^2 > 0$$
+
+```{r}
+tibble(x = 1:100,
+       PDF = dlnorm(x = x, mean = 3, sd = 0.5)) |> 
+  ggplot(aes(x, PDF))+
+  geom_point()+
+  geom_line()+
+  labs(title = "PDF логнормального распределения (μ = 3, σ = 0.5)")
+```
+
+```{r}
+#| include: false
+
+vowels |> 
+  summarise(est = fitdistrplus::fitdist(dur, distr = 'lnorm', method = 'mle')$estimate) |> 
+  pull() |> 
+  round(3)->
+  est_ml_sdl
+```
+
+::: {.callout-note}
+Какая из логнормальных моделей для длительности гласных американского английского из [@hillenbrand95] лучше подходит к данным? Попробуйте самостоятельно построить данный график.
+:::
+
+```{r}
+#| echo: false
+
+vowels |> 
+  ggplot(aes(dur)) + 
+  geom_histogram(aes(y =after_stat(density)), fill = "grey90") + 
+  stat_function(fun = dlnorm, args = list(mean = 5.587, sd = 0.242), color = "red")+
+  stat_function(fun = dlnorm, args = list(mean = 5.687, sd = 0.342), color = "darkgreen")+
+  stat_function(fun = dlnorm, args = list(mean = 5.487, sd = 0.262), color = "navy")+
+  labs(subtitle = "синяя: ln μ = 5.487, ln σ = 0.262\nкрасная: ln μ = 5.587, ln σ = 0.242\nзеленая: ln μ = 5.687, ln σ = 0.342\n",
+       x = "длительность гласного (мс)",
+       y = "значение функции плотности")
+```
+
+### Что еще почитать про распределения?
+
+Люди придумали очень много разных распределений. Стоит, наверное, также понимать, что распределения не существуют отдельно в вакууме: многие из них математически связаны друг с другом. Про это можно посмотреть [вот здесь](http://www.math.wm.edu/~leemis/chart/UDR/UDR.html) или [здесь](https://en.wikipedia.org/wiki/Relationships_among_probability_distributions).

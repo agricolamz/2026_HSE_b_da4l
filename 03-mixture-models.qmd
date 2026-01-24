@@ -1,0 +1,177 @@
+---
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup03}
+#| include: false
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, comment = "")
+options(scipen=999)
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+# Модели смеси распределений
+
+## Cмеси распределений
+
+Не все переменные выглядят так же красиво, как распределения из учебников статистики. Для примера возьмем датасет, который содержит спамерские и обычные смс-сообщения, выложенный UCI Machine Learning [на kaggle](https://www.kaggle.com/uciml/sms-spam-collection-dataset). Посчитаем количество символов в сообщениях:
+
+```{r}
+spam_sms <- read_csv("https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/main/data/spam_sms.csv")
+
+glimpse(spam_sms)
+
+spam_sms |> 
+  mutate(n_char = nchar(message)) ->
+  spam_sms
+  
+glimpse(spam_sms)
+
+spam_sms |> 
+  ggplot(aes(n_char))+
+  geom_histogram(fill = "gray90")+
+  labs(caption = "данные из kaggle.com/uciml/sms-spam-collection-dataset",
+       x = "количество символов",
+       y = "количество сообщений")
+```
+
+Мы видим два явных горба и, как можно догадаться, это связано с тем, что спамерские сообщения в среднем длиннее и сосредоточены вокруг ограничения смс в 160 символов:
+
+```{r}
+spam_sms |> 
+  ggplot(aes(n_char))+
+  geom_histogram(fill = "gray70", aes(y = after_stat(density)))+
+  geom_density(aes(fill = type), alpha = 0.3)+
+  labs(caption = "данные из kaggle.com/uciml/sms-spam-collection-dataset",
+       x = "количество символов",
+       y = "значение функции плотности")+
+  geom_vline(xintercept = 160, linetype = 2, size = 0.3)
+```
+
+## Модели смеси распределений
+
+Такого рода данные можно описать при помощи модели смеси разных распределений. Мы сейчас опишем нормальными распределениями и будем использовать пакет `mixtools` (для смесей нормальных распределений лучше использовать пакет `mclust`), но, ясно, что семейство распределений можно было бы подобрать и получше.
+
+```{r}
+library(mixtools)
+
+set.seed(42)
+spam_length_est <- normalmixEM(spam_sms$n_char)
+
+summary(spam_length_est)
+```
+
+Класс, получаемый в результате работы функции `normalmixEM()` имеет встроеный график:
+
+```{r}
+plot(spam_length_est, density = TRUE)
+```
+
+Однако, если хочется больше контроля над получаемым разультатом, я бы предложил использовать `ggplot()`:
+
+```{r}
+new_dnorm <- function(x, mu, sigma, lambda){
+  dnorm(x, mu, sigma)*lambda
+}
+
+spam_sms |> 
+  ggplot(aes(n_char))+
+  geom_histogram(aes(y = after_stat(density)), fill = "gray90")+
+  stat_function(fun = new_dnorm, 
+                args = c(mu = spam_length_est$mu[1],
+                                          sigma = spam_length_est$sigma[1],
+                                          lambda = spam_length_est$lambda[1]),
+                color = "#F8766D")+
+  stat_function(fun = new_dnorm, 
+                args = c(mu = spam_length_est$mu[2],
+                                          sigma = spam_length_est$sigma[2],
+                                          lambda = spam_length_est$lambda[2]),
+                color = "#00BFC4")+
+  labs(caption = "данные из kaggle.com/uciml/sms-spam-collection-dataset",
+       x = "количество символов",
+       y = "значение функции плотности")+
+  geom_vline(xintercept = 160, linetype = 2, size = 0.3)
+```
+
+Таким образом мы получили классификатор
+
+```{r}
+first <- new_dnorm(seq(1, 750, by = 1), 
+                   mu = spam_length_est$mu[1],
+                   sigma = spam_length_est$sigma[1],
+                   lambda = spam_length_est$lambda[1])
+second <- new_dnorm(seq(1, 750, by = 1), 
+                    mu = spam_length_est$mu[2],
+                    sigma = spam_length_est$sigma[2],
+                    lambda = spam_length_est$lambda[2])
+which(first > second)
+```
+
+Если в смс-сообщении больше 62 символов, то согласно нашей модели, вероятнее всего это спам.
+
+```{r}
+spam_sms |> 
+  mutate(model_predict = ifelse(n_char > 63, "predicted_spam", "predicted_ham")) |> 
+  count(model_predict, type) |> 
+  pivot_wider(names_from = type, values_from = n)
+```
+
+Результат не идеальный, но лучше чем помечать как спам каждое 13 сообщение $747/(4825+747)$.
+
+::: {.callout-note}
+В работе [@coretta2016] собраны [данные](https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/main/data/Coretta_2017_icelandic.csv) длительности исландских гласных. Отфильтруйте данные, оставив наблюдения гласного [a] (переменная `vowel`), произнесенные носителем `tt01` (переменная `speaker`) и постройте следующие графики, моделируя длительность гласного (переменная `vowel.dur`) смесью трех нормальных распределений. Как вам кажется, насколько хорошо модель смеси справилась с заданием?
+:::
+
+```{r}
+#| echo: false
+#| message: false
+
+read_csv("https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/main/data/Coretta_2017_icelandic.csv") |> 
+  filter(speaker == "tt01", vowel == "a") ->
+  vowel_dur
+
+set.seed(42)
+vowel_length_est <- normalmixEM(vowel_dur$vowel.dur, k = 3)
+
+vowel_dur |> 
+  ggplot(aes(vowel.dur))+
+  geom_histogram(aes(y = after_stat(density)), fill = "gray90")+
+  stat_function(fun = new_dnorm, 
+                args = c(mu = vowel_length_est$mu[1],
+                         sigma = vowel_length_est$sigma[1],
+                         lambda = vowel_length_est$lambda[1]),
+                color = "#00BA38")+
+  stat_function(fun = new_dnorm, 
+                args = c(mu = vowel_length_est$mu[2],
+                         sigma = vowel_length_est$sigma[2],
+                         lambda = vowel_length_est$lambda[2]),
+                color = "#F8766D")+
+  stat_function(fun = new_dnorm, 
+                args = c(mu = vowel_length_est$mu[3],
+                         sigma = vowel_length_est$sigma[3],
+                         lambda = vowel_length_est$lambda[3]),
+                color = "#619CFF")+
+  labs(caption = "данные [Coretta 2016]",
+       title = "результаты модели",
+       x = "длительность гласного [a] носителя tt01",
+       y = "значение функции плотности")
+
+vowel_dur |> 
+  ggplot(aes(vowel.dur))+
+  geom_histogram(aes(y = after_stat(density)), fill = "gray90")+
+  geom_density(aes(color = place))+
+  labs(caption = "данные [Coretta 2016]",
+       title = "функции плотности",
+       x = "длительность гласного [a] носителя tt01",
+       y = "значение функции плотности")+
+  theme(legend.position = "bottom")
+```
+
+## Несколько замечаний
+
+- В наших примерах нам была доступна информация о классах (spam/ham, coronal/labial/velar), однако модель смесей распределений как раз имеет смысл применять, когда такой информации нет.
+- В смеси распределений может быть любое количество распределений.
+- Модели смеси распределений не ограничены только нормальным распределением, алгоритм можно использовать и для других распределений.
+- Чаще всего в моделях смеси распределений используются распределения одного семейства, однако можно себе представить и комбинации посложнее.
+- Модели смеси распределений (mixture models) не стоит путать со смешанными моделями (mixed effects models).

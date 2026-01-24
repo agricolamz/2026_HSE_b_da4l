@@ -1,0 +1,296 @@
+---
+title: Метод максимального правдоподобия
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup02}
+#| include: false
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, comment = "")
+options(scipen=999)
+library(tidyverse)
+theme_set(theme_bw())
+library(checkdown)
+```
+
+## Оценка вероятности
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+#| include=FALSE
+vowels <- read_csv("https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/main/data/phonTools_hillenbrand_1995.csv") 
+
+vowels |> 
+  summarise(est = fitdistrplus::fitdist(dur, distr = 'lnorm', method = 'mle')$estimate) |> 
+  pull() |> 
+  round(3)->
+  est_ml_sdl
+```
+
+Когда у нас задано некоторое распределение, мы можем задавать к нему разные вопросы. Например, если мы верим что длительность гласных американского английского из [@hillenbrand95] можно описать логнормальным распределением с параметрами $\ln{\mu} =$ `r est_ml_sdl[1]` и $\ln{\sigma} =$ `r est_ml_sdl[2]`, то мы можем делать некотрые предсказания относительно интересующей нас переменной. 
+
+```{r}
+ggplot() + 
+  stat_function(fun = dlnorm, args = list(mean = 5.587, sd = 0.242))+
+  scale_x_continuous(breaks = 0:6*100, limits = c(0, 650))+
+  labs(x = "длительность гласного (мс)",
+       y = "значение функции плотности")
+```
+
+
+::: {.callout-note}
+Если принять на веру, что логнормальное распределение с параметрами $\ln{\mu} =$ 5.587 и $\ln{\sigma}=$ 0.242 описывает данные длительности гласных американского английского из [@hillenbrand95], то какова вероятность наблюдать значения между 300 и 400 мс? То же самое можно записать, используя математическую нотацию:
+
+$$P\left(X \in [300,\, 400] | X \sim \ln{\mathcal{N}}(\ln{\mu} = 5.587, \ln{\sigma}=0.242)\right) = ??$$
+Ответ округлите до трех и меньше знаков после запятой.
+:::
+
+```{r}
+#| echo: false
+ggplot() + 
+  stat_function(fun = dlnorm, args = list(mean = 5.587, sd = 0.242))+
+  stat_function(fun = dlnorm, args = list(mean = 5.587, sd = 0.242), 
+                xlim = c(300, 400), geom = "area", fill = "lightblue")+
+  scale_x_continuous(breaks = 0:6*100, limits = c(0, 650))+
+  labs(x = "длительность гласного (мс)", y = "значение функции плотности")
+```
+
+```{r}
+#| echo: false
+
+round(plnorm(400, mean = 5.587, sd = 0.242) - plnorm(300, mean = 5.587, sd = 0.242), 3) |> 
+  check_question(placeholder = "0.123")
+```
+
+::: {.callout-note}
+Если принять на веру, что биномиальное распределение с параметрами $p =$ 0.9 описывает, согласно [@rosenbach03: 394] употребление *s*-генитивов в британском английском, то какова вероятность наблюдать значения между 300 и 350 генитивов в интервью, содержащее 400 генитивных контекстов? То же самое можно записать, используя математическую нотацию:
+
+$$P\left(X \in [300,\, 350] | X \sim Binom(n = 400, p = 0.9)\right) = ??$$
+Ответ округлите до трех и меньше знаков после запятой.
+:::
+
+```{r}
+#| echo: false
+
+# round(pbinom(350, size = 400, prob = 0.9) - pbinom(300, size = 400, prob = 0.9), 3)
+round(sum(dbinom(300:350, size = 400, prob = 0.9)), 3) |> 
+  check_question(placeholder = "0.123")
+```
+
+## Функция правдоподобия
+
+Если при поиске вероятностей, мы предполагали, что данные нам **неизвестны**, а распределение и его параметры **известны**, то функция правдоподобия позволяет этот процесс перевернуть, запустив поиск параметров распределения, при изветсных данных и семье распределения:
+
+$$L\left(X \sim Distr(...)|x\right) = ...$$
+
+Таким образом получается, что на основании функции плотности мы можем сравнивать, какой параметр лучше подходит к нашим данным.
+
+Для примера рассмотрим наш s-генетив: мы провели интервью и нам встретилось 85 *s*-генетивов из 100 случаев всех генетивов. Насколько хорошо подходит нам распределение с параметром *p* = 0.9?
+
+```{r}
+#| echo: false
+tibble(x = 0:100) |> 
+  ggplot(aes(x)) +
+  stat_function(fun = function(x) dbinom(x, 100, 0.9), geom = "col")+
+  geom_segment(aes(x = 85, xend = 85, y = 0, yend = dbinom(85, 100, 0.9)), color = "red")+
+  geom_segment(aes(x = 85, xend = 0, y = dbinom(85, 100, 0.9), yend = dbinom(85, 100, 0.9)), color = "red", arrow = arrow(length = unit(0.02, "npc")))+
+  scale_x_continuous(breaks = c(0:5*20, 85))+
+  scale_y_continuous(breaks = c(0:3*0.05, round(dbinom(85, 100, 0.9), 3)))+
+  labs(x = "Количество s-генитивов в интервью")
+```
+
+Ответ:
+
+```{r}
+dbinom(85, 100, 0.9)
+```
+
+Представим теперь это как функцию от параметра *p*:
+
+```{r}
+tibble(p = seq(0, 1, by = 0.01)) |> 
+  ggplot(aes(p)) +
+  stat_function(fun = function(p) dbinom(85, 100, p), geom = "col")+
+  labs(x = "параметр биномиального распределения p",
+       y = "значение функции правдоподобия\n(одно наблюдение)")
+```
+
+А что если мы располагаем двумя интервью одного актера? В первом на сто генитивов пришлось 85 s-генитивов, а во втором -- 89. В таком случае, также как и с вероятностью наступления двух независимых событий, значения функции плотности перемножаются.
+
+```{r}
+dbinom(85, 100, 0.9)*dbinom(89, 100, 0.9)
+```
+
+
+```{r}
+tibble(p = seq(0, 1, by = 0.01)) |> 
+  ggplot(aes(p)) +
+  stat_function(fun = function(p) dbinom(85, 100, p)*dbinom(89, 100, p), geom = "col")+
+  labs(x = "параметр биномиального распределения p",
+       y = "значение функции правдоподобия\n(два наблюдения)")
+```
+
+В итоге:
+
+* вероятность --- P(data|distribution)
+* правдоподобие --- L(distribution|data)
+
+Интеграл распределения/сумма значений вероятностей равен/на 1. [Интеграл распределения/сумма значений правдоподобия может быть не равен/на 1](https://stats.stackexchange.com/a/31241/225843).
+
+## Пример с непрерывным распределением
+
+Мы уже обсуждали, что длительность гласных американского английского из [@hillenbrand95] можно описать логнормальным распределением с параметрами $\ln\mu$  и $\ln\sigma$. Предположим, что $\ln\sigma = 0.342$, построим функцию правдоподобия для $\ln\mu$:
+
+```{r}
+vowels <- read_csv("https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/main/data/phonTools_hillenbrand_1995.csv") 
+
+tibble(ln_mu = seq(5, 6, by = 0.001)) |> 
+  ggplot(aes(ln_mu)) + 
+  stat_function(fun = function(ln_mu) dlnorm(vowels$dur[1], meanlog = ln_mu, sdlog = 0.242))+
+  labs(x = "параметр логнормального распределения ln μ",
+       y = "значение функции правдоподобия\n(одно наблюдение)")
+
+tibble(ln_mu = seq(5, 6, by = 0.001)) |> 
+  ggplot(aes(ln_mu)) + 
+  stat_function(fun = function(ln_mu) dlnorm(vowels$dur[1], meanlog = ln_mu, sdlog = 0.242)*dlnorm(vowels$dur[2], meanlog = ln_mu, sdlog = 0.242))+
+  labs(x = "параметр логнормального распределения ln μ",
+       y = "значение функции правдоподобия\n(два наблюдения)")
+tibble(ln_mu = seq(5, 6, by = 0.001)) |> 
+  ggplot(aes(ln_mu)) + 
+  stat_function(fun = function(ln_mu) dlnorm(vowels$dur[1], meanlog = ln_mu, sdlog = 0.242)*dlnorm(vowels$dur[2], meanlog = ln_mu, sdlog = 0.242)*dlnorm(vowels$dur[3], meanlog = ln_mu, sdlog = 0.242))+
+  labs(x = "параметр логнормального распределения ln μ",
+       y = "значение функции правдоподобия\n(три наблюдения)")
+```
+
+Для простоты в начале я зафиксировал один из параметров логнормального распредления: лог стандартное отклонение. Конечно, это совсем необязательно делать: можно создать матрицу значений лог среднего и лог стандартного отклонения и получить для каждой ячейки матрицы значения функции правдоподобия.
+
+## Метод максимального правдоподобия (MLE)
+
+Функция правдоподобия позволяет подбирать параметры распределения. Оценка параметров распределения при помощи функции максимального правдоподобия получила название метод максимального правдоподобия. Его я и использовал ранее для того, чтобы получить значения распределений для заданий из первого занятия:
+
+- данные длительности американских гласных из [@hillenbrand95] и логнормальное распределение
+```{r}
+fitdistrplus::fitdist(vowels$dur, distr = 'lnorm', method = 'mle')
+```
+
+- количество андийских слогов в словах и распределение Пуассона
+```{r}
+andic_syllables <- read_csv("https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/main/data/andic_syllables.csv") 
+
+andic_syllables |> 
+  filter(language == "Andi") |> 
+  uncount(count) |> 
+  pull(n_syllables) |> 
+  fitdistrplus::fitdist(distr = 'pois', method = 'mle')
+```
+
+- Есть и другие методы оценки параметров.
+- Метод максимального правдоподобия может быть чувствителен к размеру выборки.
+
+::: {.callout-note}
+Отфильтруйте из [данных с количеством слогов в андийских языках](https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/main/data/andic_syllables.csv) багвалинский и, используя метод максимального правдоподобия, оцените для них параметры модели Пуассона.
+:::
+
+::: {.callout-note}
+В работе [@coretta2016] собраны [данные](https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/main/data/Coretta_2017_icelandic.csv) длительности исландских гласных. Отфильтруйте данные, оставив односложные слова (переменная `syllables`) после придыхательного (переменная `aspiration`), произнесенные носителем `tt01` (переменная `speaker`) и постройте следующий график, моделируя длительность гласных (переменная `vowel.dur`) нормальным и логнормальным распределением. Как вам кажется, какое распределение лучше подходит к данным? Докажите ваше утверждение, сравнив значения правдоподобия. 
+:::
+
+```{r}
+#| echo: false
+df <- read_csv("https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/main/data/Coretta_2017_icelandic.csv")
+
+df |> 
+  filter(speaker == "tt01",
+         syllables == "mono",
+         aspiration == "yes") |> 
+  pull(vowel.dur) ->
+  vowel_dur
+
+lnorm_params <- fitdistrplus::fitdist(vowel_dur, distr = 'lnorm', method = 'mle')
+norm_params <- fitdistrplus::fitdist(vowel_dur, distr = 'norm', method = 'mle')
+
+tibble(vowel_dur) |> 
+  ggplot(aes(vowel_dur))+
+  geom_density()+
+  stat_function(fun = dlnorm, args = list(lnorm_params$estimate[1], lnorm_params$estimate[2]), color = "red")+
+  stat_function(fun = dnorm, args = list(norm_params$estimate[1], norm_params$estimate[2]), color = "darkgreen")+
+  labs(subtitle = "Черная линия -- данные,\nзеленая и красная линии -- нормальное и логнормальное распределения соответственно,\nполученные методом максимального правдоподобия",
+       x = "длительность гласных", 
+       y = "функция плотности",
+       caption = "данные [Coretta 2016]")
+
+# prod(dnorm(vowel_dur, norm_params$estimate[1], norm_params$estimate[2]))/prod(dlnorm(vowel_dur, lnorm_params$estimate[1], lnorm_params$estimate[2]))
+```
+
+
+## Логорифм функции правдоподобия
+
+Так как в большинстве случаев нужно найти лишь максимум функции правдоподобия, а не саму функцию $\ell(x|\theta)$, то для облегчения подсчетов используют логорифмическую функцию правдоподобия $\ln\ell(x|\theta)$: в результате, вместо произведения появляется сумма[^log]:
+
+$$\text{argmax}_\theta \prod \ell(\theta|x) = \text{argmax}_\theta \sum \ln\ell(\theta|x) $$
+
+[^log]: Это просто свойство логарифмов: `log(5*5) = log(5)+log(5)`
+
+Во всех предыдущих примерах мы смотрели на 1--3 примера данных, давайте попробуем использовать функцию правдоподобия для большего набора данных.
+
+::: {.callout-note}
+Представим, что мы проводим некоторый эксперимент, и у некоторых участников все получается с первой попытки, а некоторым нужна еще одна попытка или даже две. Дополните код функциями правдоподобия и логорифмической функцией правдоподобия, чтобы получился график ниже.
+:::
+
+```{r, eval = FALSE}
+set.seed(42)
+v <- sample(0:2, 10, replace = TRUE)
+
+sapply(seq(0.01, 0.99, 0.01), function(p){
+  ...
+}) ->
+  likelihood
+
+sapply(seq(0.01, 0.99, 0.01), function(p){
+  ...
+}) ->
+  loglikelihood
+
+tibble(p = seq(0.01, 0.99, 0.01),
+       loglikelihood,
+       likelihood) |> 
+  pivot_longer(names_to = "type", values_to = "value", loglikelihood:likelihood) |> 
+  ggplot(aes(p, value))+
+  geom_line()+
+  geom_vline(xintercept = 0.33, linetype = 2)+
+  facet_wrap(~type, scales = "free_y", nrow = 2)+
+  scale_x_continuous(breaks = c(0:5*0.25, 0.33))
+```
+
+```{r, echo = FALSE}
+set.seed(42)
+v <- sample(0:2, 10, replace = TRUE)
+
+sapply(seq(0.01, 0.99, 0.01), function(p){
+  prod(dgeom(v, prob = p))
+}) ->
+  likelihood
+
+sapply(seq(0.01, 0.99, 0.01), function(p){
+  sum(log(dgeom(v, prob = p)))
+}) ->
+  loglikelihood
+
+tibble(p = seq(0.01, 0.99, 0.01),
+       loglikelihood,
+       likelihood) |> 
+  pivot_longer(names_to = "type", values_to = "value", loglikelihood:likelihood) |> 
+  ggplot(aes(p, value))+
+  geom_line()+
+  geom_vline(xintercept = 0.59, linetype = 2)+
+  facet_wrap(~type, scales = "free_y", nrow = 2)+
+  scale_x_continuous(breaks = c(0:5*0.25, 0.59))
+```
+
+## Послесловие
+
+- Не стоит путать [метод максимального правдоподобия (MLE) c градиентным спуском](https://stats.stackexchange.com/questions/183871/what-is-the-difference-between-maximum-likelihood-estimation-gradient-descent/183872#183872)
+- Метод максимального правдоподобия --- не единственный способ оценить параметр, смотрите, например, Maximum Spacing Estimation [@cheng83; @ranneby84; @anatolyev05], см. `msedist()` из пакета `fitdistrplus`.

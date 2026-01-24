@@ -1,0 +1,153 @@
+---
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup05}
+#| include: false
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, comment = "")
+options(scipen=999)
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+# Байесовский доверительный интервал
+
+Рассмотрим простенькую задачу, которую мы видели раньше:
+
+::: {.callout-note}
+Немного упрощая данные из статьи [@rosenbach03: 394], можно сказать что носители британского английского предпочитают *s*-генитив (90%) *of*-генитиву (10%). Проведите байесовский апдейт, если Вы наблюдаете в интервью британского актера из 120 контекстов 92 *s*-генитивов. Априорное распределение берите соразмерное данным. Ответ округлите до трёх или менее знаков после запятой.
+:::
+
+```{r}
+tibble(x = seq(0, 1, by = 0.001),
+       y = dbeta(x, 108+92, 12+28)) |>
+  ggplot(aes(x, y))+
+  geom_line()
+```
+
+## Фреквентисткий доверительный интервал
+
+Фреквентистский доверительный интервал (по-английски confidence interval) основан на правиле трех сигм нормального распределения:
+
+```{r}
+#| echo: false
+#| fig-height: 2.5
+
+ggplot(data.frame(x = 0:1), aes(x)) + 
+        stat_function(fun = dnorm, args = c(0, 1), geom = 'area', xlim = c(-3, 3), fill = 'deepskyblue4') + 
+      stat_function(fun = dnorm, args = c(0, 1), geom = 'area', xlim = c(-2, 2), fill = 'cadetblue') + 
+    stat_function(fun = dnorm, args = c(0, 1), geom = 'area', xlim = c(-1, 1), fill = 'lightblue') + 
+    stat_function(fun = dnorm, args = c(0, 1), xlim = c(-3, 3))+
+  geom_line(aes(y = c(0.15), x = c(-1, 1)), arrow = arrow(length=unit(0.2,"cm"), ends="both", type = "closed"))+
+  geom_line(aes(y = c(0.03), x = c(-2, 2)), arrow = arrow(length=unit(0.2,"cm"), ends="both", type = "closed"))+
+  annotate(geom = "text", x = 0, y = 0.17, label = "68.26%")+
+  annotate(geom = "text", x = 0, y = 0.05, label = "95.44%")+
+  scale_x_continuous(breaks = c(-3:3))+
+  labs(y = "",
+       x = "σ")
+```
+
+**z-score**:
+
+- 95% данных находится в 1.96 стандартных отклонений
+- 99% данных находится в 2.58 стандартных отклонений
+
+Доверительный интервал:
+
+- предположим, что данные генеральной совокупности нормально распределены
+- тогда доверительные интервалы выборок взятых из генеральной совокупности будут [покрывать среднее генеральной совокупности](https://rpsychologist.com/d3/CI/)
+
+$$\bar{x} \pm z \times \frac{\sigma}{\sqrt{n}}\text{, где } z \text{ — это z-оценка } 1 - \frac{\alpha}{2} \text{ часть данных}$$
+
+Распространение этой логики на биномиальные данные называется интервал Вальда:
+
+$$\bar{x} = \theta; \sigma = \sqrt{\frac{\theta\times(1-\theta)}{n}}$$
+
+Тогда интервал Вальда:
+
+$$\theta \pm  z\times\sqrt{\frac{\theta\times(1-\theta)} {n}}$$
+
+Есть только одна проблема: работает он плохо. Его аналоги перечислены в других работ:
+
+- assymptotic method with continuity correction
+- Wilson score
+- Wilson Score method with continuity correction
+- Jeffreys interval
+- Clopper–Pearson interval (default in R `binom.test()`)
+- Agresti–Coull interval
+- ... см. пакет `binom`
+
+```{r}
+#| fig-height: 7
+low_ci <- binom.test(x = 108+92, n = 108+92+12+28)$conf.int[1]
+up_ci <-  binom.test(x = 108+92, n = 108+92+12+28)$conf.int[2]
+
+tibble(x = seq(0, 1, by = 0.001),
+       y = dbeta(x, 108+92, 12+28)) |>
+  ggplot(aes(x, y))+
+  geom_line()+
+  annotate(geom = "errorbar", y = 0, xmin = low_ci, xmax = up_ci, color = "red")+
+  labs(title = "Апостериорное распределение",
+       subtitle = "красным фреквентисткий 95% доверительный интервал",
+       x = "", y = "")
+```
+
+В базовом пакете функция `binom.test()` не позволяет выбирать тип доверительного интервала. `ci.method = "Clopper-Pearson"` возможна, если включить библиотеку `mosaic`. 
+
+## Байесовский доверительный интервал
+
+Байесовский доверительный $(100-k)$-% интервал (по-английски credible interval) --- это интервал $[\frac{k}{2}, 1-\frac{k}{2}]$ от апостериорного распределения.
+
+```{r}
+low_ci <- binom.test(x = 108+92, n = 108+92+12+28)$conf.int[1]
+up_ci <-  binom.test(x = 108+92, n = 108+92+12+28)$conf.int[2]
+
+cred_int_l <- qbeta(0.025, 108+92, 12+28)
+cred_int_h <- qbeta(0.975, 108+92, 12+28)
+
+tibble(x = seq(0, 1, by = 0.001),
+       y = dbeta(x, 108+92, 12+28)) |>
+  ggplot(aes(x, y))+
+  geom_line()+
+  annotate(geom = "errorbar", y = 0, xmin = low_ci, xmax = up_ci, color = "red")+
+  annotate(geom = "errorbar", y = -1, xmin = cred_int_l, xmax = cred_int_h, color = "lightblue")+
+  labs(title = "Апостериорное распределение",
+       subtitle = "красным фреквентисткий 95% доверительный интервал\nсиним байесовский 95% доверительный интервал",
+       x = "", y = "")
+```
+
+::: {.callout-note}
+В работе [@coretta2016] собраны [данные](https://raw.githubusercontent.com/agricolamz/2025_HSE_b_da4l/refs/heads/main/data/Coretta_2017_icelandic.csv) длительности исландских гласных. Отфильтруйте данные, произнесенные носителем `tt01` (переменная `speaker`), произведите байесовский апдейт данных, моделируя  длительность гласных (переменная `vowel.dur`) нормальным распределением и постройте график. На графике отобразите 80% и 95% байесовский доверительный интервал (при построении интервала я использовал аргумент `width = 0.001`). В качестве априорного распределения используйте нормальное распределение со средним 87 и стандартным отклонением 25. 
+:::
+
+```{r}
+#| echo: false
+
+read_csv("https://raw.githubusercontent.com/agricolamz/2025_HSE_b_da4l/refs/heads/main/data/Coretta_2017_icelandic.csv") |> 
+  filter(speaker == "tt01") ->
+  vowels
+
+sd_prior <- 25
+sd_data <- sd(vowels$vowel.dur)
+sd_post <- 1/sqrt(1/sd_prior^2 + 1/sd_data^2)
+mean_prior <- 87
+mean_data <- mean(vowels$vowel.dur)
+mean_post <- weighted.mean(c(mean_prior, mean_data), c(1/sd_prior^2, 1/sd_data^2))
+
+cred_int_l_80 <- qnorm(0.1, mean_post, sd_post)
+cred_int_h_80 <- qnorm(0.9, mean_post, sd_post)
+
+cred_int_l_95 <- qnorm(0.025, mean_post, sd_post)
+cred_int_h_95 <- qnorm(0.975, mean_post, sd_post)
+
+vowels |>
+  ggplot(aes(vowel.dur)) +
+  geom_histogram(aes(y = ..density..), fill = "grey")+
+  stat_function(fun = dnorm, args = list(mean_prior,  sd_prior), color = "lightblue")+
+  stat_function(fun = dnorm, args = list(mean_post,  sd_post), color = "red")+
+  annotate(geom = "errorbar", y = 0, xmin = cred_int_l_80, xmax = cred_int_h_80, width = 0.001, size = 2)+
+  annotate(geom = "errorbar", y = -0.001, xmin = cred_int_l_95, xmax = cred_int_h_95, width = 0.001, size = 2)+
+  annotate(geom = "text", y = -0.002, x = mean_post, label = "95% credible interval")+
+  annotate(geom = "text", y = 0.001, x = mean_post, label = "80% credible interval")
+```

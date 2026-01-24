@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.29">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>9&nbsp; Введение в Марковские цепи Монте-Карло – daR4hs</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./10-advanced-regression.html" rel="next">
+<link href="./08-a-b-testing.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-0815c480559380816a4d1ea211a47e91.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-320ad5607646c56df2c4e55503b78b49.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="site_libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="site_libs/viz-1.8.2/viz.js"></script>
+<link href="site_libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
+<script src="site_libs/grViz-binding-1.0.11/grViz.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./09-Introduction-to-MCMC.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Введение в Марковские цепи Монте-Карло</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">daR4hs</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/agricolamz/2025_HSE_b_da4l/" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">О курсе</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Распределения</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-likelihood.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Метод максимального правдоподобия</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-mixture-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Модели смеси распределений</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-intro-to-Bayes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Байесовский статистический вывод</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-confidence-intervals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Байесовский доверительный интервал</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-Bayes-factor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Коэффициент Байеса</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-Empirical-Bayes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Эмпирическая байесовская оценка</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-a-b-testing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">A/B тестирование с пакетом <code>bayesAB</code></span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09-Introduction-to-MCMC.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Введение в Марковские цепи Монте-Карло</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10-advanced-regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Ограничения на применение регрессии</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11-introduction_to_bayesian_regression_with_brms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Байесовский регрессионный анализ</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./12-introduction_to_logistic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Введение в логистическую регресиию</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#марковские-цепи" id="toc-марковские-цепи" class="nav-link active" data-scroll-target="#марковские-цепи"><span class="header-section-number">9.1</span> Марковские цепи</a></li>
+  <li><a href="#хакерская-статистика-основано-на-статистика-для-хакеров-джейка-вандерпласа" id="toc-хакерская-статистика-основано-на-статистика-для-хакеров-джейка-вандерпласа" class="nav-link" data-scroll-target="#хакерская-статистика-основано-на-статистика-для-хакеров-джейка-вандерпласа"><span class="header-section-number">9.2</span> Хакерская статистика (основано на “Статистика для хакеров” Джейка Вандерпласа)</a>
+  <ul class="collapse">
+  <li><a href="#биномиальные-данные" id="toc-биномиальные-данные" class="nav-link" data-scroll-target="#биномиальные-данные"><span class="header-section-number">9.2.1</span> Биномиальные данные</a></li>
+  <li><a href="#метод-монте-карло" id="toc-метод-монте-карло" class="nav-link" data-scroll-target="#метод-монте-карло"><span class="header-section-number">9.2.2</span> Метод Монте-Карло</a></li>
+  </ul></li>
+  <li><a href="#соединение-идей-марковских-цепей-и-монте-карло" id="toc-соединение-идей-марковских-цепей-и-монте-карло" class="nav-link" data-scroll-target="#соединение-идей-марковских-цепей-и-монте-карло"><span class="header-section-number">9.3</span> Соединение идей Марковских цепей и Монте-Карло</a></li>
+  <li><a href="#brms" id="toc-brms" class="nav-link" data-scroll-target="#brms"><span class="header-section-number">9.4</span> <code>brms</code></a>
+  <ul class="collapse">
+  <li><a href="#регрессионный-пример" id="toc-регрессионный-пример" class="nav-link" data-scroll-target="#регрессионный-пример"><span class="header-section-number">9.4.1</span> Регрессионный пример</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Введение в Марковские цепи Монте-Карло</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Марковская цепь Монте-Карло (Markov chain Monte Carlo, MCMC) — это класс алгоритмов для семплирования, которые позволяют моделировать некоторое распределение вероятностей. При моделировании используют разные алгоритмы, мы будем смотреть на примере алгоритма Метрополиса-Гастингса (Metropolis-Hastings).</p>
+<p>Для того, чтобы в этом разобраться нам потребуется обсудить:</p>
+<ul>
+<li>метод Монте-Карло;</li>
+<li>марковские цепи;</li>
+<li>алгоритма Метрополиса-Гастингса.</li>
+</ul>
+<section id="марковские-цепи" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="марковские-цепи"><span class="header-section-number">9.1</span> Марковские цепи</h2>
+<p>Марковский процесс</p>
+<ul>
+<li>конечное количество состояний</li>
+<li>вероятность переходов из одного состояния в другое</li>
+</ul>
+<p>Возьмем наш датасет с sms и посмотрим частоты разных частей речи::</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="09-Introduction-to-MCMC_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Теперь давайте посмотрим на частотность переходов из одних состояний в другие:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="09-Introduction-to-MCMC_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Иногда это визуализируют при помощи графов, но в нашем случае (это граф ham) это достаточно бесполезно (наводите на вершины стрелочки, чтобы что-то разглядеть):</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="grViz html-widget html-fill-item" id="htmlwidget-cd0ac6cfc0c437f6b891" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-cd0ac6cfc0c437f6b891">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"ADJ\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1.25,0!\"] \n  \"2\" [label = \"ADP\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1.16559028675544,0.451552082733941!\"] \n  \"3\" [label = \"ADV\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0.923761146525824,0.842119554558197!\"] \n  \"4\" [label = \"AUX\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0.557172944720673,1.11895411419383!\"] \n  \"5\" [label = \"CCONJ\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0.115335449329128,1.24466772036879!\"] \n  \"6\" [label = \"DET\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"-0.342078737590104,1.20228205396602!\"] \n  \"7\" [label = \"INTJ\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"-0.75329329547407,0.9975215341003!\"] \n  \"8\" [label = \"NOUN\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"-1.06277141966202,0.658040203596695!\"] \n  \"9\" [label = \"NUM\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"-1.22871637460488,0.229686897270713!\"] \n  \"10\" [label = \"PART\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"-1.22871637460488,-0.229686897270713!\"] \n  \"11\" [label = \"PRON\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"-1.06277141966202,-0.658040203596695!\"] \n  \"12\" [label = \"PROPN\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"-0.753293295474071,-0.997521534100299!\"] \n  \"13\" [label = \"PUNCT\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"-0.342078737590104,-1.20228205396602!\"] \n  \"14\" [label = \"SCONJ\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0.115335449329127,-1.24466772036879!\"] \n  \"15\" [label = \"SYM\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0.557172944720673,-1.11895411419383!\"] \n  \"16\" [label = \"VERB\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0.923761146525824,-0.842119554558196!\"] \n  \"17\" [label = \"X\", width = \"0.2\", fontsize = \"4\", penwidth = \"0.1\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1.16559028675544,-0.451552082733941!\"] \n\"1\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝ADJ 0.16\"] \n\"1\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝ADP 0.28\"] \n\"1\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝ADV 0.14\"] \n\"1\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝AUX 0.05\"] \n\"1\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝CCONJ 0.22\"] \n\"1\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝DET 0.03\"] \n\"1\"->\"7\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝INTJ 0.01\"] \n\"1\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝NOUN 2.7\"] \n\"1\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝NUM 0.04\"] \n\"1\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝PART 0.15\"] \n\"1\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝PRON 0.19\"] \n\"1\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝PROPN 0.06\"] \n\"1\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝PUNCT 1.07\"] \n\"1\"->\"14\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝SCONJ 0.08\"] \n\"1\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝SYM 0.04\"] \n\"1\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝VERB 0.08\"] \n\"1\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADJ➝X 0.02\"] \n\"2\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝ADJ 0.32\"] \n\"2\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝ADP 0.32\"] \n\"2\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝ADV 0.15\"] \n\"2\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝AUX 0\"] \n\"2\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝CCONJ 0.14\"] \n\"2\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝DET 1.23\"] \n\"2\"->\"7\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝INTJ 0.01\"] \n\"2\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝NOUN 1.64\"] \n\"2\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝NUM 0.27\"] \n\"2\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝PART 0.01\"] \n\"2\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝PRON 1.34\"] \n\"2\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝PROPN 0.33\"] \n\"2\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝PUNCT 0.17\"] \n\"2\"->\"14\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝SCONJ 0.02\"] \n\"2\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝SYM 0.02\"] \n\"2\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝VERB 0.02\"] \n\"2\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADP➝X 0.03\"] \n\"3\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝ADJ 0.64\"] \n\"3\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝ADP 0.45\"] \n\"3\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝ADV 0.92\"] \n\"3\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝AUX 0.5\"] \n\"3\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝CCONJ 0.19\"] \n\"3\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝DET 0.17\"] \n\"3\"->\"7\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝INTJ 0.03\"] \n\"3\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝NOUN 0.15\"] \n\"3\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝NUM 0.12\"] \n\"3\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝PART 0.14\"] \n\"3\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝PRON 0.9\"] \n\"3\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝PROPN 0.04\"] \n\"3\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝PUNCT 1.42\"] \n\"3\"->\"14\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝SCONJ 0.13\"] \n\"3\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝SYM 0.09\"] \n\"3\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝VERB 1.15\"] \n\"3\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"ADV➝X 0.03\"] \n\"4\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝ADJ 0.73\"] \n\"4\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝ADP 0.33\"] \n\"4\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝ADV 0.73\"] \n\"4\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝AUX 0.31\"] \n\"4\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝CCONJ 0.03\"] \n\"4\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝DET 0.31\"] \n\"4\"->\"7\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝INTJ 0\"] \n\"4\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝NOUN 0.12\"] \n\"4\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝NUM 0.04\"] \n\"4\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝PART 0.99\"] \n\"4\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝PRON 1.09\"] \n\"4\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝PROPN 0.06\"] \n\"4\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝PUNCT 0.07\"] \n\"4\"->\"14\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝SCONJ 0.01\"] \n\"4\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝SYM 0.04\"] \n\"4\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝VERB 2.33\"] \n\"4\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"AUX➝X 0.02\"] \n\"5\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝ADJ 0.18\"] \n\"5\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝ADP 0.03\"] \n\"5\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝ADV 0.2\"] \n\"5\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝AUX 0.14\"] \n\"5\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝CCONJ 0.01\"] \n\"5\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝DET 0.11\"] \n\"5\"->\"7\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝INTJ 0.01\"] \n\"5\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝NOUN 0.77\"] \n\"5\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝NUM 0.03\"] \n\"5\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝PART 0.02\"] \n\"5\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝PRON 0.63\"] \n\"5\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝PROPN 0.05\"] \n\"5\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝PUNCT 0.02\"] \n\"5\"->\"14\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝SCONJ 0.05\"] \n\"5\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝SYM 0.01\"] \n\"5\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝VERB 0.45\"] \n\"5\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"CCONJ➝X 0.02\"] \n\"6\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝ADJ 0.87\"] \n\"6\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝ADP 0.04\"] \n\"6\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝ADV 0.05\"] \n\"6\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝AUX 0.02\"] \n\"6\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝CCONJ 0.02\"] \n\"6\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝DET 0.07\"] \n\"6\"->\"7\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝INTJ 0\"] \n\"6\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝NOUN 3.08\"] \n\"6\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝NUM 0.07\"] \n\"6\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝PART 0.01\"] \n\"6\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝PRON 0.06\"] \n\"6\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝PROPN 0.06\"] \n\"6\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝PUNCT 0.04\"] \n\"6\"->\"14\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝SCONJ 0\"] \n\"6\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝SYM 0.01\"] \n\"6\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝VERB 0.07\"] \n\"6\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"DET➝X 0\"] \n\"7\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝ADJ 0.03\"] \n\"7\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝ADP 0.01\"] \n\"7\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝ADV 0.09\"] \n\"7\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝AUX 0.05\"] \n\"7\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝CCONJ 0.04\"] \n\"7\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝DET 0.04\"] \n\"7\"->\"7\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝INTJ 0.2\"] \n\"7\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝NOUN 0.03\"] \n\"7\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝NUM 0.01\"] \n\"7\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝PART 0\"] \n\"7\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝PRON 0.31\"] \n\"7\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝PROPN 0.03\"] \n\"7\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝PUNCT 0.91\"] \n\"7\"->\"14\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝SCONJ 0.01\"] \n\"7\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝SYM 0.02\"] \n\"7\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝VERB 0.27\"] \n\"7\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"INTJ➝X 0.01\"] \n\"8\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝ADJ 0.23\"] \n\"8\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝ADP 1.71\"] \n\"8\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝ADV 0.97\"] \n\"8\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝AUX 0.82\"] \n\"8\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝CCONJ 0.9\"] \n\"8\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝DET 0.11\"] \n\"8\"->\"7\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝INTJ 0.04\"] \n\"8\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝NOUN 2.29\"] \n\"8\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝NUM 0.21\"] \n\"8\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝PART 0.35\"] \n\"8\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝PRON 0.71\"] \n\"8\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝PROPN 0.06\"] \n\"8\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝PUNCT 5.93\"] \n\"8\"->\"14\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝SCONJ 0.24\"] \n\"8\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝SYM 0.2\"] \n\"8\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝VERB 0.9\"] \n\"8\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NOUN➝X 0.04\"] \n\"9\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝ADJ 0.06\"] \n\"9\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝ADP 0.06\"] \n\"9\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝ADV 0.03\"] \n\"9\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝AUX 0.02\"] \n\"9\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝CCONJ 0.03\"] \n\"9\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝DET 0.03\"] \n\"9\"->\"7\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝INTJ 0\"] \n\"9\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝NOUN 0.67\"] \n\"9\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝NUM 0.03\"] \n\"9\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝PART 0.02\"] \n\"9\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝PRON 0.09\"] \n\"9\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝PROPN 0.06\"] \n\"9\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝PUNCT 0.22\"] \n\"9\"->\"14\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝SCONJ 0.01\"] \n\"9\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝SYM 0.03\"] \n\"9\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝VERB 0.04\"] \n\"9\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"NUM➝X 0.01\"] \n\"10\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝ADJ 0.11\"] \n\"10\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝ADP 0.03\"] \n\"10\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝ADV 0.13\"] \n\"10\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝AUX 0.15\"] \n\"10\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝CCONJ 0.01\"] \n\"10\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝DET 0.04\"] \n\"10\"->\"7\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝INTJ 0.01\"] \n\"10\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝NOUN 0.14\"] \n\"10\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝NUM 0.01\"] \n\"10\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝PART 0\"] \n\"10\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝PRON 0.06\"] \n\"10\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝PROPN 0.01\"] \n\"10\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝PUNCT 0.06\"] \n\"10\"->\"14\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝SCONJ 0.01\"] \n\"10\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝SYM 0\"] \n\"10\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝VERB 2.28\"] \n\"10\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PART➝X 0.01\"] \n\"11\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝ADJ 0.51\"] \n\"11\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝ADP 0.55\"] \n\"11\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝ADV 0.85\"] \n\"11\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝AUX 3.91\"] \n\"11\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝CCONJ 0.15\"] \n\"11\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝DET 0.29\"] \n\"11\"->\"7\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝INTJ 0.04\"] \n\"11\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝NOUN 1.98\"] \n\"11\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝NUM 0.06\"] \n\"11\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝PART 0.2\"] \n\"11\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝PRON 0.31\"] \n\"11\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝PROPN 0.07\"] \n\"11\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝PUNCT 1.17\"] \n\"11\"->\"14\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝SCONJ 0.07\"] \n\"11\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝SYM 0.03\"] \n\"11\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝VERB 4.13\"] \n\"11\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PRON➝X 0.03\"] \n\"12\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝ADJ 0.04\"] \n\"12\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝ADP 0.11\"] \n\"12\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝ADV 0.09\"] \n\"12\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝AUX 0.15\"] \n\"12\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝CCONJ 0.1\"] \n\"12\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝DET 0.02\"] \n\"12\"->\"7\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝INTJ 0.02\"] \n\"12\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝NOUN 0.17\"] \n\"12\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝NUM 0.07\"] \n\"12\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝PART 0.09\"] \n\"12\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝PRON 0.13\"] \n\"12\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝PROPN 1.16\"] \n\"12\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝PUNCT 0.8\"] \n\"12\"->\"14\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝SCONJ 0.02\"] \n\"12\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝SYM 0.06\"] \n\"12\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝VERB 0.23\"] \n\"12\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PROPN➝X 0.01\"] \n\"13\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝ADJ 0.5\"] \n\"13\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝ADP 0.21\"] \n\"13\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝ADV 0.84\"] \n\"13\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝AUX 0.63\"] \n\"13\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝CCONJ 0.47\"] \n\"13\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝DET 0.32\"] \n\"13\"->\"7\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝INTJ 0.41\"] \n\"13\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝NOUN 1.22\"] \n\"13\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝NUM 0.07\"] \n\"13\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝PART 0.07\"] \n\"13\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝PRON 2.58\"] \n\"13\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝PROPN 0.65\"] \n\"13\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝PUNCT 1.12\"] \n\"13\"->\"14\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝SCONJ 0.23\"] \n\"13\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝SYM 0.18\"] \n\"13\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝VERB 1.11\"] \n\"13\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"PUNCT➝X 0.08\"] \n\"14\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SCONJ➝ADJ 0.02\"] \n\"14\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SCONJ➝ADP 0.01\"] \n\"14\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SCONJ➝ADV 0.06\"] \n\"14\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SCONJ➝AUX 0.02\"] \n\"14\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SCONJ➝CCONJ 0.01\"] \n\"14\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SCONJ➝DET 0.04\"] \n\"14\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SCONJ➝NOUN 0.06\"] \n\"14\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SCONJ➝NUM 0.01\"] \n\"14\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SCONJ➝PART 0.02\"] \n\"14\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SCONJ➝PRON 0.84\"] \n\"14\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SCONJ➝PROPN 0.03\"] \n\"14\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SCONJ➝PUNCT 0\"] \n\"14\"->\"14\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SCONJ➝SCONJ 0.03\"] \n\"14\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SCONJ➝SYM 0.01\"] \n\"14\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SCONJ➝VERB 0.2\"] \n\"14\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SCONJ➝X 0.01\"] \n\"15\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝ADJ 0.04\"] \n\"15\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝ADP 0.02\"] \n\"15\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝ADV 0.06\"] \n\"15\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝AUX 0.02\"] \n\"15\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝CCONJ 0.03\"] \n\"15\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝DET 0.02\"] \n\"15\"->\"7\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝INTJ 0\"] \n\"15\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝NOUN 0.06\"] \n\"15\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝NUM 0.03\"] \n\"15\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝PART 0.01\"] \n\"15\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝PRON 0.06\"] \n\"15\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝PROPN 0.02\"] \n\"15\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝PUNCT 0.05\"] \n\"15\"->\"14\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝SCONJ 0.01\"] \n\"15\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝SYM 0.04\"] \n\"15\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝VERB 0.11\"] \n\"15\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"SYM➝X 0\"] \n\"16\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝ADJ 0.54\"] \n\"16\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝ADP 1.76\"] \n\"16\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝ADV 1.42\"] \n\"16\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝AUX 0.07\"] \n\"16\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝CCONJ 0.28\"] \n\"16\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝DET 1.42\"] \n\"16\"->\"7\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝INTJ 0.06\"] \n\"16\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝NOUN 1.29\"] \n\"16\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝NUM 0.31\"] \n\"16\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝PART 0.94\"] \n\"16\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝PRON 3.84\"] \n\"16\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝PROPN 0.17\"] \n\"16\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝PUNCT 1.18\"] \n\"16\"->\"14\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝SCONJ 0.35\"] \n\"16\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝SYM 0.09\"] \n\"16\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝VERB 0.28\"] \n\"16\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"VERB➝X 0.05\"] \n\"17\"->\"1\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"X➝ADJ 0.06\"] \n\"17\"->\"2\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"X➝ADP 0.01\"] \n\"17\"->\"3\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"X➝ADV 0.04\"] \n\"17\"->\"4\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"X➝AUX 0\"] \n\"17\"->\"5\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"X➝CCONJ 0.01\"] \n\"17\"->\"6\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"X➝DET 0.01\"] \n\"17\"->\"7\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"X➝INTJ 0\"] \n\"17\"->\"8\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"X➝NOUN 0.07\"] \n\"17\"->\"9\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"X➝NUM 0\"] \n\"17\"->\"10\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"X➝PART 0\"] \n\"17\"->\"11\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"X➝PRON 0.03\"] \n\"17\"->\"12\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"X➝PROPN 0.01\"] \n\"17\"->\"13\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"X➝PUNCT 0.07\"] \n\"17\"->\"15\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"X➝SYM 0\"] \n\"17\"->\"16\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"X➝VERB 0.06\"] \n\"17\"->\"17\" [penwidth = \"0.3\", fontsize = \"2\", arrowsize = \"0.4\", arrowhead = \"vee\", tooltip = \"X➝X 0.3\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p>Можно посмотреть на <a href="http://setosa.io/blog/2014/07/26/markov-chains/index.html">славную визуализацию</a> (спасибо за ссылку Марине Дубовой).</p>
+</section>
+<section id="хакерская-статистика-основано-на-статистика-для-хакеров-джейка-вандерпласа" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="хакерская-статистика-основано-на-статистика-для-хакеров-джейка-вандерпласа"><span class="header-section-number">9.2</span> Хакерская статистика (основано на <a href="https://www.youtube.com/watch?v=Iq9DzN6mvYA">“Статистика для хакеров” Джейка Вандерпласа</a>)</h2>
+<p>Вообще симуляции позволяют делать статистику более осмысленной.</p>
+<section id="биномиальные-данные" class="level3" data-number="9.2.1">
+<h3 data-number="9.2.1" class="anchored" data-anchor-id="биномиальные-данные"><span class="header-section-number">9.2.1</span> Биномиальные данные</h3>
+<div class="callout callout-style-simple callout-note no-icon">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-body-container">
+<p>Немного упрощая данные из статьи <span class="citation" data-cites="rosenbach03">(<a href="#ref-rosenbach03" role="doc-biblioref">Rosenbach 2003</a>: 394)</span>, можно сказать что носители британского английского предпочитают <em>s</em>-генитив (90%) <em>of</em>-генитиву (10%). Можно ли сказать, что перед Вами носитель британского английского, если Вы наблюдаете в интервью актера из 120 контекстов 100 <em>s</em>-генитивов?</p>
+</div>
+</div>
+</div>
+<p>Вероятность получить 100 успехов из 120 случаев, если мы верим, что вероятность успеха равна 0.9 описывается биномиальным распределением:</p>
+<p><span class="math display">\[P(H = h|p, n) = \binom{n}{h}\times p^h\times(1-p)^{1-h}\]</span></p>
+<p><strong>Фреквентистский подход</strong>: биномиальный тест</p>
+<ul>
+<li>H<span class="math inline">\(_0\)</span> человек говорит <em>s</em>-генитив с вероятностью 0.9</li>
+<li>α = 0.05</li>
+</ul>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 107 rows containing non-finite outside the scale range
+(`stat_align()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="09-Introduction-to-MCMC_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Байесовский подход</strong>: биномиальная функция правдоподобия перемножается с априорным бета распределением чтобы получить апостериорное распределение.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">h =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.01</span>),</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="fu">dbeta</span>(h, <span class="at">shape1 =</span> <span class="dv">100</span> <span class="sc">+</span> <span class="dv">90</span>, <span class="at">shape2 =</span> <span class="dv">20</span> <span class="sc">+</span> <span class="dv">10</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(h, y))<span class="sc">+</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()<span class="sc">+</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">ifelse</span>(h<span class="sc">&gt;=</span><span class="fu">qbeta</span>(<span class="fl">0.025</span>, <span class="at">shape1 =</span> <span class="dv">100</span> <span class="sc">+</span> <span class="dv">90</span>, <span class="at">shape2 =</span> <span class="dv">20</span> <span class="sc">+</span> <span class="dv">10</span>) <span class="sc">&amp;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                           h<span class="sc">&lt;=</span><span class="fu">qbeta</span>(<span class="fl">0.975</span>, <span class="at">shape1 =</span> <span class="dv">100</span> <span class="sc">+</span> <span class="dv">90</span>, <span class="at">shape2 =</span> <span class="dv">20</span> <span class="sc">+</span> <span class="dv">10</span>), h, <span class="cn">NA</span>)), <span class="at">fill =</span> <span class="st">"darkgreen"</span>)<span class="sc">+</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">100</span><span class="sc">/</span><span class="dv">120</span>, <span class="at">linetype =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 92 rows containing non-finite outside the scale range
+(`stat_align()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="09-Introduction-to-MCMC_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Хакерский подход</strong>: симуляция:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dbl</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>, <span class="cf">function</span>(i){</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">1</span>, <span class="dv">120</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.9</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>()</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>}) <span class="ot">-&gt;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  simulations</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">sum =</span> simulations) <span class="sc">|&gt;</span> </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">greater =</span> sum <span class="sc">&lt;=</span> <span class="dv">100</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(greater) <span class="sc">|&gt;</span> </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">number =</span> <span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["greater"],"name":[1],"type":["lgl"],"align":["right"]},{"label":["number"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"FALSE","2":"978"},{"1":"TRUE","2":"22"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">sum =</span> simulations) <span class="sc">|&gt;</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(sum))<span class="sc">+</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>()<span class="sc">+</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">100</span>, <span class="at">linetype =</span> <span class="dv">2</span>)<span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">9</span><span class="sc">*</span><span class="dv">20</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">120</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="09-Introduction-to-MCMC_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Аналогично можно использовать:</p>
+<ul>
+<li>случайное перемешивание вместо двухвыборочного t-теста;</li>
+<li>бутстрэп вместо одновыборочного t-теста.</li>
+</ul>
+</section>
+<section id="метод-монте-карло" class="level3" data-number="9.2.2">
+<h3 data-number="9.2.2" class="anchored" data-anchor-id="метод-монте-карло"><span class="header-section-number">9.2.2</span> Метод Монте-Карло</h3>
+<p>Группа методов изучения случайных процессов, которые базируются на:</p>
+<ul>
+<li>возможности производить бесконечного количества случайных значений</li>
+<li>для известных или новых распределений</li>
+</ul>
+<p>Представим себе, что у нас есть какой-то интеграл, который мы хотим посчитать. Например такой:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">1000</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(x))<span class="sc">+</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> <span class="cf">function</span>(x){x<span class="sc">^</span><span class="dv">12</span><span class="sc">-</span><span class="fu">sin</span>(x)<span class="sc">+</span><span class="dv">1</span>}, <span class="at">geom =</span> <span class="st">"area"</span>, <span class="at">fill =</span> <span class="st">"lightblue"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="09-Introduction-to-MCMC_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Мы можем насэмплировать точек из комбинации двух унимодальных распределений u(0, 1), и u(0, 1.2) и посмотреть, кто попадает в область, а кто нет:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">runif</span>(<span class="fl">1e3</span>, <span class="dv">0</span>, <span class="dv">1</span>), </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="fu">runif</span>(<span class="fl">1e3</span>, <span class="dv">0</span>, <span class="fl">1.2</span>),</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">in_area =</span> y <span class="sc">&lt;</span> x<span class="sc">^</span><span class="dv">12</span><span class="sc">-</span><span class="fu">sin</span>(x)<span class="sc">+</span><span class="dv">1</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(x, y))<span class="sc">+</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> <span class="cf">function</span>(x){x<span class="sc">^</span><span class="dv">12</span><span class="sc">-</span><span class="fu">sin</span>(x)<span class="sc">+</span><span class="dv">1</span>}, <span class="at">geom =</span> <span class="st">"area"</span>, <span class="at">fill =</span> <span class="st">"lightblue"</span>)<span class="sc">+</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> in_area), <span class="at">show.legend =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="09-Introduction-to-MCMC_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Сколько попало?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">runif</span>(<span class="fl">1e3</span>, <span class="dv">0</span>, <span class="dv">1</span>), </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="fu">runif</span>(<span class="fl">1e3</span>, <span class="dv">0</span>, <span class="fl">1.2</span>),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">in_area =</span> y <span class="sc">&lt;</span> x<span class="sc">^</span><span class="dv">12</span><span class="sc">-</span><span class="fu">sin</span>(x)<span class="sc">+</span><span class="dv">1</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(in_area)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["in_area"],"name":[1],"type":["lgl"],"align":["right"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"FALSE","2":"472"},{"1":"TRUE","2":"528"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dv">528</span><span class="sc">/</span><span class="dv">1000</span><span class="sc">*</span><span class="fl">1.2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.6336</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">integrate</span>(<span class="cf">function</span>(x){x<span class="sc">^</span><span class="dv">12</span><span class="sc">-</span><span class="fu">sin</span>(x)<span class="sc">+</span><span class="dv">1</span>}, <span class="dv">0</span>, <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0.6172254 with absolute error &lt; 6.9e-15</code></pre>
+</div>
+</div>
+<p>А если увеличить количество наблюдений?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">runif</span>(<span class="fl">1e7</span>, <span class="dv">0</span>, <span class="dv">1</span>), </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="fu">runif</span>(<span class="fl">1e7</span>, <span class="dv">0</span>, <span class="fl">1.2</span>),</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">in_area =</span> y <span class="sc">&lt;</span> x<span class="sc">^</span><span class="dv">12</span><span class="sc">-</span><span class="fu">sin</span>(x)<span class="sc">+</span><span class="dv">1</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(in_area)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["in_area"],"name":[1],"type":["lgl"],"align":["right"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"FALSE","2":"4856333"},{"1":"TRUE","2":"5143667"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="dv">5143667</span><span class="sc">/</span><span class="dv">10000000</span><span class="sc">*</span><span class="fl">1.2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.61724</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">integrate</span>(<span class="cf">function</span>(x){x<span class="sc">^</span><span class="dv">12</span><span class="sc">-</span><span class="fu">sin</span>(x)<span class="sc">+</span><span class="dv">1</span>}, <span class="dv">0</span>, <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0.6172254 with absolute error &lt; 6.9e-15</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="соединение-идей-марковских-цепей-и-монте-карло" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="соединение-идей-марковских-цепей-и-монте-карло"><span class="header-section-number">9.3</span> Соединение идей Марковских цепей и Монте-Карло</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>shiny<span class="sc">::</span><span class="fu">runGitHub</span>(<span class="st">"agricolamz/mcmc_shiny"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Основные проблемы MCMC:</p>
+<ul>
+<li>Зависимость от начального значения. Решение: выкинуть начальную часть цепи (burn-in).</li>
+<li>Полученные значения автокоррелируют, так как они были получины при помощи марковского процесса. Решение: брать, например, каждое третье значение.</li>
+</ul>
+<p>Вы можете почитать историю идей MCMC в работе <span class="citation" data-cites="robert11">(<a href="#ref-robert11" role="doc-biblioref">Robert and Casella 2011</a>)</span> (<a href="https://arxiv.org/pdf/0808.2902.pdf">доступна здесь</a>).</p>
+</section>
+<section id="brms" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="brms"><span class="header-section-number">9.4</span> <code>brms</code></h2>
+<p>Для вычисления всяких сложных статистических моделей люди придумали вероятностные языки программирования. Чаще всего они являются расширением для стандартных языков программирования, но иногда становятся самодостаточными языками (однако они все равно написаны на каких-то быстрых языках программирования типа C++). Примерами таких самодостаточных языков является:</p>
+<ul>
+<li>BUGS (Bayesian inference Using Gibbs Sampling)</li>
+<li>JAGS (Just Another Gibbs Sampler)</li>
+<li>NIMBLE</li>
+<li>NUTS (No-U-Turn-Sampler)</li>
+<li>Stan</li>
+</ul>
+<p>Для них пишут обертки на разных языках, мы будем использовать пакет <code>brms</code>, который является оберткой над пакетом <code>rstan</code>, который является оберткой для Stan. Вы можете установить эти пакеты к себе на компьютер, но есть высокая вероятность, что что-то пойдет не так, в связи с чем, я предлагаю всем использовать rstudio.cloud для примеров на <code>brms</code>.</p>
+<p>Чтобы повторить примеры Вам нужно:</p>
+<ul>
+<li>Установить на свой компьютер <code>rstan</code> (<a href="https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started">инструкции</a>) и <code>brms</code></li>
+</ul>
+<p>Если на вашем компьютере не выходит, попробуйте &lt;posit.cloud&gt;</p>
+<section id="регрессионный-пример" class="level3" data-number="9.4.1">
+<h3 data-number="9.4.1" class="anchored" data-anchor-id="регрессионный-пример"><span class="header-section-number">9.4.1</span> Регрессионный пример</h3>
+<div class="callout callout-style-simple callout-note no-icon">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-body-container">
+<p>В работе <span class="citation" data-cites="coretta2016">(<a href="#ref-coretta2016" role="doc-biblioref">Coretta 2016</a>)</span> собраны <a href="https://raw.githubusercontent.com/agricolamz/2022_da4l/master/data/Coretta_2017_icelandic.csv">данные</a> длительности исландских гласных. Отфильтруйте данные, произнесенные носителем <code>tt01</code> (переменная <code>speaker</code>), и смоделируйте длительность гласных (переменная <code>vowel.dur</code>) нормальным распределением используя в качестве априорного распределения нормальное распределение со средним 275 и стандартным отклонением 65 (основано на <span class="citation" data-cites="hillenbrand95">(<a href="#ref-hillenbrand95" role="doc-biblioref">Hillenbrand et al. 1995</a>)</span>).</p>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/master/data/Coretta_2017_icelandic.csv"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(speaker <span class="sc">==</span> <span class="st">"tt01"</span>) <span class="ot">-&gt;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  vowel_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>В качестве первого этапа стоит сформулировать модель и посмотреть, в какой форме от нас ожидают априорное распределение.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(brms)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">get_prior</span>(vowel.dur <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> Intercept, </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">family =</span> <span class="st">"normal"</span>,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">data =</span> vowel_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["prior"],"name":[1],"type":["chr"],"align":["left"]},{"label":["class"],"name":[2],"type":["chr"],"align":["left"]},{"label":["coef"],"name":[3],"type":["chr"],"align":["left"]},{"label":["group"],"name":[4],"type":["chr"],"align":["left"]},{"label":["resp"],"name":[5],"type":["chr"],"align":["left"]},{"label":["dpar"],"name":[6],"type":["chr"],"align":["left"]},{"label":["nlpar"],"name":[7],"type":["chr"],"align":["left"]},{"label":["lb"],"name":[8],"type":["chr"],"align":["left"]},{"label":["ub"],"name":[9],"type":["chr"],"align":["left"]},{"label":["tag"],"name":[10],"type":["chr"],"align":["left"]},{"label":["source"],"name":[11],"type":["chr"],"align":["left"]}],"data":[{"1":"","2":"b","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"default"},{"1":"","2":"b","3":"Intercept","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"default"},{"1":"student_t(3, 0, 17.7)","2":"sigma","3":"","4":"","5":"","6":"","7":"","8":"0","9":"","10":"","11":"default"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Сделаем нашу первую модель:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>normal_fit <span class="ot">&lt;-</span> <span class="fu">brm</span>(vowel.dur <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> Intercept, </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">family =</span> <span class="st">"normal"</span>,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> vowel_data,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">275</span>, <span class="dv">65</span>), <span class="at">coef =</span> Intercept)),</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">silent =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 8e-06 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.08 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.017 seconds (Warm-up)
+Chain 1:                0.01 seconds (Sampling)
+Chain 1:                0.027 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 3e-06 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.03 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.014 seconds (Warm-up)
+Chain 2:                0.01 seconds (Sampling)
+Chain 2:                0.024 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 2e-06 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.014 seconds (Warm-up)
+Chain 3:                0.011 seconds (Sampling)
+Chain 3:                0.025 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 2e-06 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.014 seconds (Warm-up)
+Chain 4:                0.009 seconds (Sampling)
+Chain 4:                0.023 seconds (Total)
+Chain 4: </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>normal_fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Family: gaussian 
+  Links: mu = identity 
+Formula: vowel.dur ~ 0 + Intercept 
+   Data: vowel_data (Number of observations: 175) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Regression Coefficients:
+          Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept    89.57      1.94    85.87    93.53 1.00     2804     2296
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma    24.96      1.32    22.57    27.80 1.00     2921     2730
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
+</div>
+</div>
+<p>Визуализируем нашу модель:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(normal_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="09-Introduction-to-MCMC_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>После того как мы сгенерировали наши распределения, мы можем их достать и что-нибудь посчитать:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as_draws_array</span>(normal_fit) <span class="sc">|&gt;</span> </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  posterior<span class="sc">::</span><span class="fu">summarize_draws</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["variable"],"name":[1],"type":["chr"],"align":["left"]},{"label":["mean"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["median"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["sd"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["mad"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["q5"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["q95"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["rhat"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["ess_bulk"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["ess_tail"],"name":[10],"type":["dbl"],"align":["right"]}],"data":[{"1":"b_Intercept","2":"89.56964","3":"89.54803","4":"1.9368368","5":"1.9375460","6":"86.47023","7":"92.79344","8":"1.004128","9":"2803.510","10":"2296.090"},{"1":"sigma","2":"24.96290","3":"24.90471","4":"1.3190889","5":"1.2847158","6":"22.87616","7":"27.29635","8":"1.001032","9":"2920.802","10":"2730.159"},{"1":"lprior","2":"-13.36194","3":"-13.35514","4":"0.1186642","5":"0.1141600","6":"-13.56441","7":"-13.17640","8":"1.000922","9":"3016.826","10":"2488.158"},{"1":"lp__","2":"-821.56593","3":"-821.25094","4":"1.0312496","5":"0.7314534","6":"-823.67733","7":"-820.59928","8":"1.001109","9":"1839.507","10":"2288.670"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as_draws_rvars</span>(normal_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A draws_rvars: 1000 iterations, 4 chains, and 4 variables
+$b_Intercept: rvar&lt;1000,4&gt;[1] mean ± sd:
+[1] 90 ± 1.9 
+
+$sigma: rvar&lt;1000,4&gt;[1] mean ± sd:
+[1] 25 ± 1.3 
+
+$lprior: rvar&lt;1000,4&gt;[1] mean ± sd:
+[1] -13 ± 0.12 
+
+$lp__: rvar&lt;1000,4&gt;[1] mean ± sd:
+[1] -822 ± 1 </code></pre>
+</div>
+</div>
+<p>Можно визуально оценить, где лежат наши данные, а что предсказывает полученная модель:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pp_check</span>(normal_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="09-Introduction-to-MCMC_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-coretta2016" class="csl-entry" role="listitem">
+Coretta, Stefano. 2016. <span>“Vowel Duration and Aspiration Effects in Icelandic.”</span> University of York.
+</div>
+<div id="ref-hillenbrand95" class="csl-entry" role="listitem">
+Hillenbrand, James, Laura A Getty, Michael J Clark, and Kimberlee Wheeler. 1995. <span>“Acoustic Characteristics of American English Vowels.”</span> <em>The Journal of the Acoustical Society of America</em> 97 (5): 3099–3111.
+</div>
+<div id="ref-robert11" class="csl-entry" role="listitem">
+Robert, C., and G. Casella. 2011. <span>“A Short History of Markov Chain Monte Carlo: Subjective Recollections from Incomplete Data.”</span> <em>Statistical Science</em> 26 (1): 102–15.
+</div>
+<div id="ref-rosenbach03" class="csl-entry" role="listitem">
+Rosenbach, Anette. 2003. <span>“Aspects of Iconicity and Economy in the Choice Between the <em>s-</em>Genitive and the <em>of-</em>Genitive in <span>E</span>nglish.”</span> In <em>Determinants of Grammatical Variation in English</em>, edited by Günter Rohdenburg and Britta Mondorf. Berlin, New York: Mouton de Gruyter.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./08-a-b-testing.html" class="pagination-link" aria-label="A/B тестирование с пакетом `bayesAB`">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">A/B тестирование с пакетом <code>bayesAB</code></span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./10-advanced-regression.html" class="pagination-link" aria-label="Ограничения на применение регрессии">
+        <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Ограничения на применение регрессии</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

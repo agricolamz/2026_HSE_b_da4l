@@ -1,0 +1,288 @@
+---
+editor_options: 
+  chunk_output_type: console
+---
+
+# Введение в логистическую регресиию
+
+```{r setup12}
+#| include: false
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+```{r}
+library(tidyverse)
+```
+
+## Основы регрессионного анализа
+
+```{r}
+#| echo: false
+#| warning: false
+
+set.seed(42)
+tibble(x = rnorm(150)+1) %>% 
+  mutate(y = 5*x+10+rnorm(100, sd = 2)) %>% 
+  ggplot(aes(x, y))+
+  geom_point()+
+  geom_hline(yintercept = 0, linetype = 2)+
+  geom_vline(xintercept = 0, linetype = 2)+
+  geom_smooth(method = "lm", se = FALSE)+
+  annotate(geom = "point", x = 0, y = 10, size = 4, color = "red")+
+  annotate(geom = "label", x = -0.5, y = 12, size = 5, color = "red", label = "intercept")+
+  annotate(geom = "label", x = 2, y = 12.5, size = 5, color = "red", label = "slope")+
+  scale_x_continuous(breaks = -2:4)+
+  scale_y_continuous(breaks = c(0:3*10, 15))
+pBrackets::grid.brackets(815, 420, 815, 545, lwd=2, col="red")
+```
+
+Когда мы используем регрессионный анализ, мы пытаемся оценить два параметра:
+
+* свободный член (intercept) -- значение $y$ при $x = 0$;
+* угловой коэффициент (slope) -- изменение $y$ при изменении $x$ на одну единицу.
+
+$$y_i = \hat{\beta_0} + \hat{\beta_1}\times x_i + \epsilon_i$$
+
+Причем, иногда мы можем один или другой параметр считать равным нулю.
+
+При этом, вне зависимости от статистической школы, у регрессии есть свои ограничения на применение:
+
+- линейность связи между $x$ и $y$;
+- нормальность распределение остатков $\epsilon_i$;
+- гомоскидастичность --- равномерность распределения остатков на всем протяжении $x$;
+- независимость переменных;
+- независимость наблюдений друг от друга.
+
+## Логистическая регрессия
+
+Логистическая (logit, logistic) и мультиномиальная (multinomial) регрессия применяются в случаях, когда зависимая переменная является категориальной:
+
+- с двумя значениями (логистическая регрессия)
+- с более чем двумя значениями, упорядоченными в иерархию (порядковая регрессия)
+- с более чем двумя значениями (мультиномиальная регрессия)
+
+### Теория
+
+Мы хотим чего-то такого:
+$$\underbrace{y}_{[-\infty, +\infty]}=\underbrace{\mbox{β}_0+\mbox{β}_1\cdot x_1+\mbox{β}_2\cdot x_2 + \dots +\mbox{β}_k\cdot x_k +\mbox{ε}_i}_{[-\infty, +\infty]}$$
+Вероятность — отношение количества успехов к общему числу событий:
+$$p = \frac{\mbox{\# успехов}}{\mbox{\# неудач} + \mbox{\# успехов}}, p \in [0, 1]$$
+Шансы — отношение количества успехов к количеству неудач:
+$$odds = \frac{p}{1-p} = \frac{p\mbox{(успеха)}}{p\mbox{(неудачи)}}, odds \in [0, +\infty]$$
+Натуральный логарифм шансов:
+$$\log(odds) \in [-\infty, +\infty]$$
+
+Но, что нам говорит логарифм шансов? Как нам его интерпретировать?
+
+```{r}
+tibble(n = 10,
+       success = 1:9,
+       failure = n - success,
+       prob.1 = success/(success+failure),
+       odds = success/failure,
+       log_odds = log(odds),
+       prob.2 = exp(log_odds)/(1+exp(log_odds)))
+```
+
+Как связаны вероятность и логарифм шансов:
+$$\log(odds) = \log\left(\frac{p}{1-p}\right)$$
+$$p = \frac{\exp(\log(odds))}{1+\exp(\log(odds))}$$
+
+::: {.callout-note}
+Логарифм шансов равен 0.25. Посчитайте вероятность успеха (округлите до 3 знаков после запятой):
+:::
+
+```{r}
+#| echo: false
+
+library(checkdown)
+log_odds <- 5/20
+check_question(answer = round(exp(log_odds)/(1+exp(log_odds)), 3))
+```
+
+Как связаны вероятность и логарифм шансов:
+
+```{r}
+#| echo: false
+
+tibble(p = seq(0, 1, 0.001),
+       log_odds = log(p/(1-p))) %>% 
+  ggplot(aes(log_odds, p))+
+  geom_line()+
+  labs(x = latex2exp::TeX("$\\log\\left(\\frac{p}{1-p}\\right)$"))
+
+tibble(p = seq(0, 1, 0.001),
+       log_odds = log(p/(1-p))+2) %>% 
+  ggplot(aes(log_odds, p))+
+  geom_line()+
+  labs(x = latex2exp::TeX("$\\log\\left(\\frac{p}{1-p}\\right)+2$"))
+
+tibble(p = seq(0, 1, 0.001),
+       log_odds = 2*log(p/(1-p))) %>% 
+  ggplot(aes(log_odds, p))+
+  geom_line()+
+  labs(x = latex2exp::TeX("$2\\times\\log\\left(\\frac{p}{1-p}\\right)$"))
+
+tibble(p = seq(0, 1, 0.001),
+       log_odds = -2*log(p/(1-p))) %>% 
+  ggplot(aes(log_odds, p))+
+  geom_line()+
+  labs(x = latex2exp::TeX("$-2\\times\\log\\left(\\frac{p}{1-p}\\right)$"))
+```
+
+### brms
+
+В датасет собрано 19 языков, со следующими переменными:
+
+* `language` --- переменная, содержащая язык
+* `tone` --- бинарная переменная, обозначающая наличие тонов
+* `long_vowels` --- бинарная переменная, обозначающая наличие долгих гласных
+* `stress` --- бинарная переменная, обозначающая наличие ударения
+* `ejectives` --- бинарная переменная, обозначающая наличие абруптивных
+* `consonants` --- переменная, содержащая информацию о количестве согласных
+* `vowels` --- переменная, содержащая информацию о количестве гласных
+
+```{r}
+#| message: false
+
+phonological_profiles <- read_csv("https://raw.githubusercontent.com/agricolamz/2023_da4l/master/data/phonological_profiles.csv")
+glimpse(phonological_profiles)
+
+set.seed(42)
+phonological_profiles %>% 
+  ggplot(aes(ejectives, consonants))+
+  geom_boxplot(aes(fill = ejectives), show.legend = FALSE, outlier.alpha = 0)+ 
+  # по умолчанию боксплот рисует выбросы, outlier.alpha = 0 -- это отключает
+  geom_jitter(size = 3, width = 0.2)
+```
+
+
+#### Модель без предиктора
+
+```{r}
+
+library(brms)
+parallel::detectCores()
+n_cores <- 15 # parallel::detectCores() - 1
+
+get_prior(ejectives ~ 1, 
+          family = bernoulli(), 
+          data = phonological_profiles)
+```
+
+```{r logit0}
+#| cache: true
+#| message: false
+#| error: false
+#| warning: false
+
+logit_0 <- brm(ejectives~1, 
+               family = bernoulli(), 
+               data = phonological_profiles,
+               cores = n_cores, 
+               refresh = 0, 
+               silent = TRUE)
+```
+
+```{r}
+logit_0
+plot(logit_0)
+```
+
+В нашем датасете 13 языков не имеют абруптивных и 6 имеют, так что число, которое мы видим в коэффициенте можно оценить как $log(6/13)=-0.7732$, что немного отличается от того, что получилось в модели. Мы можем использовать прошлую формулу, чтобы получить вероятность:
+
+```{r}
+coef <- -0.79
+exp(coef)/(1+exp(coef))
+```
+
+#### Модель c одним числовым предиктором
+
+```{r logit1}
+#| cache: true
+#| message: false
+#| error: false
+#| warning: false
+
+logit_1 <- brm(ejectives~consonants, 
+               family = bernoulli(), 
+               data = phonological_profiles,
+               cores = n_cores, 
+               refresh = 0, 
+               silent = TRUE)
+```
+
+```{r}
+logit_1
+plot(logit_1)
+```
+
+```{r}
+library(tidybayes)
+
+phonological_profiles %>% 
+  add_epred_draws(logit_1, ndraws = 50) %>%  
+  mutate(ejectives = as.double(ejectives)) %>% 
+  ggplot(aes(consonants, ejectives)) +
+  stat_lineribbon(aes(y = .epred))+
+  geom_point(color = "red")
+```
+
+Картинка кривая, потому что она строится на основе наших немногочисленных данных. Если мы создадим датафрейм с согласными, то график будет более плавный:
+
+```{r}
+tibble(consonants = seq(10, 50, by = 0.1)) %>% 
+  add_epred_draws(logit_1, ndraws = 50) %>%  
+  ggplot(aes(consonants, ejectives)) +
+  stat_lineribbon(aes(y = .epred))
+```
+
+Имеет смысл смотреть предсказание модели без привязки к данным, используя функцию `conditional_effects()`:
+
+```{r}
+conditional_effects(logit_1,
+                    prob = 0.8,
+                    effects = c("consonants"))
+```
+
+
+Какова вероятность, что в языке с 29 согласными есть абруптивные?
+
+$$\log\left({\frac{p}{1-p}}\right)_i=\beta_0+\beta_1\times consinants_i + \epsilon_i$$
+$$\log\left({\frac{p}{1-p}}\right)=-15.74 + 0.60 \times 29 = 1.66$$
+$$p = \frac{e^{1.66}}{1+e^{1.66}} = 0.840238$$
+Однако в отличие от фриквентистских моделей, `predict()` на байесовских моделях делает сэмпл из распределений:
+
+```{r}
+predict(logit_1, newdata = data.frame(consonants = 29))
+predict(logit_1, newdata = data.frame(consonants = 29))
+predict(logit_1, newdata = data.frame(consonants = 29))
+predict(logit_1, newdata = data.frame(consonants = 29))
+```
+
+::: {.callout-note}
+Используйте датасет с языками и признакми из лекции для построения модели, которая предсказывает наличие ударение в зависимости от количество фонем.
+:::
+
+```{r stress_by_phonemes}
+#| cache: true
+#| echo: false
+
+phonological_profiles |>
+  mutate(stress = as.double(stress),
+         phoneme = consonants + vowels) |> 
+  brm(stress ~ phoneme, 
+      family = bernoulli(), 
+      cores = n_cores, 
+      refresh = 0, 
+      silent = TRUE,
+      data = _) ->
+  fit
+
+conditional_effects(fit,
+                    prob = 0.8,
+                    effects = c("phoneme"))
+```
+

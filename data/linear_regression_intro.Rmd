@@ -1,0 +1,86 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+```{r, message=FALSE}
+library(tidyverse)
+
+set.seed(42)
+tibble(x = rnorm(100),
+       e = rnorm(100, sd = 2), # вектор ошибок, остатков
+       slope = 5, # угловой коэффициент
+       intercept = -3, # свободный коэффициент
+       y = x*slope+intercept+e) %>% 
+  ggplot(aes(x, y))+
+  geom_point()+
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+
+$$
+y_i = \beta_0 + \beta_1\times x_i + \epsilon_i
+$$
+
+
+```{r}
+set.seed(42)
+tibble(x = rnorm(100),
+       e = rnorm(100, sd = 2), # вектор ошибок
+       slope = 5, # угловой коэффициент
+       intercept = -3, # 
+       y = x*slope+intercept+e) %>% 
+  lm(y ~x, data =.) %>% 
+  summary()
+```
+
+Смотрите, `lm()` получила наши -3 и 5, хотя видела только переменные `x` и `y`!
+
+```{r}
+set.seed(42)
+tibble(x = rnorm(100),
+       slope = 5, # угловой коэффициент
+       intercept = -3) %>%  # свободный коэффициент
+  mutate(e = ifelse(x > mean(x), rnorm(50, sd = 10), rnorm(50, sd = 2)),
+         y = x*slope+intercept+e) %>% 
+  ggplot(aes(x, y))+
+  geom_point()+
+  geom_smooth(method = "lm", se = FALSE)+
+  labs(title = "гетероскидастичные данные")
+```
+
+```{r}
+set.seed(42)
+tibble(x = rnorm(100),
+       slope = 5, # угловой коэффициент
+       intercept = -3) %>%  # свободный коэффициент
+  mutate(e = ifelse(x > mean(x), rnorm(50, sd = 10), rnorm(50, sd = 2)),
+         y = x*slope+intercept+e) %>% 
+  lm(y ~x, data =.) %>% 
+  plot() # первый график -- график остатков
+```
+
+
+```{r}
+set.seed(42)
+tibble(x = rnorm(100),
+       e = rbeta(100, shape1 = 10, shape2 = 30)*10, # вектор ошибок, остатков
+       slope = 5, # угловой коэффициент
+       intercept = -3, # свободный коэффициент
+       y = x*slope+intercept+e) %>% 
+  ggplot(aes(x, y))+
+  geom_point()+
+  geom_smooth(method = "lm", se = FALSE)+
+  geom_abline(slope = 5, intercept = -3)+
+  labs(title = "Остатки имеют бета распределение")
+
+tibble(x = rnorm(100),
+       e = rbeta(100, shape1 = 10, shape2 = 30)*10, # вектор ошибок, остатков
+       slope = 5, # угловой коэффициент
+       intercept = -3, # свободный коэффициент
+       y = x*slope+intercept+e) %>% 
+  lm(y ~x, data =.) %>% 
+  summary()
+```
+
+С бетараспределенными остатками мы получим неверную оценку углового и свободного коэффициентов.

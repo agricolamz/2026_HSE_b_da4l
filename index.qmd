@@ -1,0 +1,44 @@
+# О курсе {.unnumbered}
+
+Материалы для курса Анализа данных для лингвистов, Школа лингвистики НИУ ВШЭ.
+
+* вместо первой лекции можно посмотреть [запись лекции 2021.01.13](https://youtu.be/HmLcBJnfipk)
+* вместо второй лекции можно посмотреть [запись лекции 2021.01.15](https://youtu.be/V_c_K_wBMuY)
+* вместо третей лекции можно посмотреть [запись лекции 2021.01.20](https://youtu.be/cRc5z9F3XNw)
+* вместо четвертой лекции можно посмотреть [запись лекции 2021.01.22](https://youtu.be/zj-1-invsGM)
+* вместо пятой лекции можно посмотреть [запись лекции 2021.01.27](https://www.youtube.com/watch?v=2YRAdMLT4N0&list=PL_HB2SrKjmMJ-dUBtXUSQBZxRftJJX5uL&index=5)
+* вместо шестой лекции можно посмотреть [запись лекции 2021.01.29](https://www.youtube.com/watch?v=FA-_Qbpmb6s&list=PL_HB2SrKjmMJ-dUBtXUSQBZxRftJJX5uL&index=6)
+* вместо седьмой лекции можно посмотреть [запись лекции 2021.02.03](https://youtu.be/DkNnGeJT2K0)
+* вместо восьмой лекции можно посмотреть [запись лекции 2021.02.05](https://youtu.be/c2mej30JnRM)
+* вместо девятой лекции можно посмотреть [запись лекции 2021.02.10](https://youtu.be/9ltNRMQmt0U)
+* вместо десятой лекции можно посмотреть [запись лекции 2021.02.12](https://youtu.be/zCG_edAziVk)
+* вместо одиннадцатой лекции можно посмотреть [запись лекции 2021.02.19](https://youtu.be/6bERf7DMvfg)
+* вместо двеннадцатой лекции можно посмотреть [запись лекции 2021.02.24](https://youtu.be/I80UaVOmpxY)
+* вместо триннадцатой и четырнадцатой лекций можно посмотреть вот эти видео: [часть 1](https://youtu.be/_IltMx042DE), [часть 2](https://youtu.be/1qbk5dATogc)
+* вместо пятнадцатой лекции можно посмотреть [запись лекции 2021.03.03](https://www.youtube.com/watch?v=mIhT4y4FigY&list=PL_HB2SrKjmMJ-dUBtXUSQBZxRftJJX5uL&index=12)
+* вместо шестнадцатой лекции можно посмотреть
+[запись лекции 2021.03.05](https://www.youtube.com/watch?v=mIhT4y4FigY&list=PL_HB2SrKjmMJ-dUBtXUSQBZxRftJJX5uL&index=12) и
+[другую](https://www.youtube.com/watch?v=m06AOJBU9Bo&list=PL_HB2SrKjmMJ-dUBtXUSQBZxRftJJX5uL&index=11) и
+ [третью](https://www.youtube.com/watch?v=XkEm4SHcYbg&list=PL_HB2SrKjmMJ-dUBtXUSQBZxRftJJX5uL&index=13), 
+* вместо шестнадцатой лекции можно посмотреть вот это [видео](https://youtu.be/a75VjnY-w0s).
+
+## Используемые пакеты
+
+```{r}
+packageVersion("tidyverse")
+packageVersion("fitdistrplus")
+packageVersion("mixtools")
+packageVersion("lme4")
+packageVersion("lmerTest")
+packageVersion("car")
+packageVersion("pscl")
+packageVersion("nnet")
+packageVersion("MASS")
+packageVersion("ggeffects")
+packageVersion("brms")
+packageVersion("tidybayes")
+packageVersion("bayesAB")
+```
+
+## Домашние задания
+
