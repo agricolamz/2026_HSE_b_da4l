@@ -276,7 +276,7 @@ plot(gridExtra::arrangeGrob(p1, p2, p3))
 ## Числовые переменные
 ### Нормальное распределение
 
-$$P(x) = \frac{1}{\sigma\sqrt{2\pi}}\times e^{-\frac{\left(x-\mu\right)^2}{2\sigma^2}}$$
+$$P(x) = \frac{1}{\sqrt{2\pi\sigma^2}}\times e^{-\frac{\left(x-\mu\right)^2}{2\sigma^2}}$$
 
 $$\mu \in \mathbb{R}; \sigma^2 > 0$$
 
@@ -313,7 +313,7 @@ vowels |>
 
 ### Логнормальное распределение
 
-$$P(x) = \frac{1}{\sqrt{x\sigma2\pi}}\times e^{-\frac{\left(\ln(x)-\mu\right)^2}{2\sigma^2}}$$
+$$P(x) = \frac{1}{x\sqrt{2\pi\sigma^2}}\times e^{-\frac{\left(\ln x-\mu\right)^2}{2\sigma^2}}$$
 
 $$\mu \in \mathbb{R}; \sigma^2 > 0$$
 
