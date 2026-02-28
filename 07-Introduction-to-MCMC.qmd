@@ -354,7 +354,7 @@ pp_check(normal_fit)
 :::
 
 ```{r brm_task}
-#| echo: false
+#| include: false
 #| cache: true
 
 read_csv("https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/data/speech_tempo_zvenigorod.csv") |> 
@@ -362,8 +362,8 @@ read_csv("https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/da
   df
 
 get_prior(speech_tempo ~ 1, 
-          data = df,
-          family = gaussian())
+          family = gaussian(),
+          data = df)
 
 fit <- brm(speech_tempo ~ 1, 
            data = df, 
@@ -371,6 +371,11 @@ fit <- brm(speech_tempo ~ 1,
            prior = c(prior(normal(5.31, 1.93), class = Intercept, lb = 0), 
                      prior(normal(0, 1), class = sigma, lb = 0)),   
                   silent = TRUE)
+```
+
+
+```{r}
+#| echo: false
 
 plot(fit)
 
