@@ -14,12 +14,10 @@ book:
     - 04-intro-to-Bayes.qmd
     - 05-confidence-intervals.qmd
     - 06-Bayes-factor.qmd
-    - 07-Empirical-Bayes.qmd
-    - 08-a-b-testing.qmd
-    - 09-Introduction-to-MCMC.qmd
-    - 10-advanced-regression.qmd    
-    - 11-introduction_to_bayesian_regression_with_brms.qmd
-    - 12-introduction_to_logistic.qmd
+    - 07-Introduction-to-MCMC.qmd
+    - 08-introduction_to_bayesian_regression_with_brms.qmd
+    - 09-Empirical-Bayes.qmd
+    
     
 callout-appearance: simple
 callout-icon: false

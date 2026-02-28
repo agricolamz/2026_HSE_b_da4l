@@ -20,18 +20,16 @@ library(tidyverse)
 ```
 
 ```{r}
-#| include=FALSE
+#| include: FALSE
+
 vowels <- read_csv("https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/main/data/phonTools_hillenbrand_1995.csv") 
 
-vowels |> 
-  summarise(est = fitdistrplus::fitdist(dur, distr = 'lnorm', method = 'mle')$estimate) |> 
-  pull() |> 
-  round(3)->
+fitdistrplus::fitdist(vowels$dur, distr = 'lnorm', method = 'mle')$estimate |> 
+  round(3) ->
   est_ml_sdl
 ```
 
 Когда у нас задано некоторое распределение, мы можем задавать к нему разные вопросы. Например, если мы верим что длительность гласных американского английского из [@hillenbrand95] можно описать логнормальным распределением с параметрами $\ln{\mu} =$ `r est_ml_sdl[1]` и $\ln{\sigma} =$ `r est_ml_sdl[2]`, то мы можем делать некотрые предсказания относительно интересующей нас переменной. 
-
 ```{r}
 ggplot() + 
   stat_function(fun = dlnorm, args = list(mean = 5.587, sd = 0.242))+
@@ -39,7 +37,6 @@ ggplot() +
   labs(x = "длительность гласного (мс)",
        y = "значение функции плотности")
 ```
-
 
 ::: {.callout-note}
 Если принять на веру, что логнормальное распределение с параметрами $\ln{\mu} =$ 5.587 и $\ln{\sigma}=$ 0.242 описывает данные длительности гласных американского английского из [@hillenbrand95], то какова вероятность наблюдать значения между 300 и 400 мс? То же самое можно записать, используя математическую нотацию:

@@ -294,10 +294,8 @@ tibble(x = 1:100,
 
 vowels <- read_csv("https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/main/data/phonTools_hillenbrand_1995.csv") 
 
-vowels |> 
-  summarise(est = fitdistrplus::fitdist(dur, distr = 'norm', method = 'mle')$estimate) |> 
-  pull() |> 
-  round(3)->
+fitdistrplus::fitdist(vowels$dur, distr = 'norm', method = 'mle')$estimate |> 
+  round(3) ->
   est_m_sd
 ```
 
@@ -329,10 +327,8 @@ tibble(x = 1:100,
 ```{r}
 #| include: false
 
-vowels |> 
-  summarise(est = fitdistrplus::fitdist(dur, distr = 'lnorm', method = 'mle')$estimate) |> 
-  pull() |> 
-  round(3)->
+fitdistrplus::fitdist(vowels$dur, distr = 'lnorm', method = 'mle')$estimate |> 
+  round(3) ->
   est_ml_sdl
 ```
 
