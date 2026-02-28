@@ -300,7 +300,7 @@ read_csv("https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/master/da
 ```{r}
 library(brms)
 get_prior(vowel.dur ~ 1, 
-          family = "normal",
+          family = gaussian(),
           data = vowel_data)
 ```
 
@@ -348,3 +348,34 @@ as_draws_rvars(normal_fit)
 ```{r}
 pp_check(normal_fit)
 ```
+
+::: {.callout-note}
+В работе [@stepanova11] сообщается, что средняя скорость речи на русском языке составляет 5.31 слогов в секунду (стандартное отклонение 1.93). Скачайте [данные](https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/data/speech_tempo_zvenigorod.csv) корпуса г. Звенигород (<https://lingconlab.ru/zvenigorod/>) и оцените скорость речи носителя `ea1976`, используя данные из [@stepanova11] в качестве априорного распределения. Визуализируйте получившееся распределение. Какой вывод можно сделать о скорости речи звенигородской носительницы?
+:::
+
+```{r brm_task}
+#| echo: false
+#| cache: true
+
+read_csv("https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/data/speech_tempo_zvenigorod.csv") |> 
+  filter(speaker == "ea1976") ->
+  df
+
+get_prior(speech_tempo ~ 1, 
+          data = df,
+          family = gaussian())
+
+fit <- brm(speech_tempo ~ 1, 
+           data = df, 
+           family = gaussian(),
+           prior = c(prior(normal(5.31, 1.93), class = Intercept, lb = 0), 
+                     prior(normal(0, 1), class = sigma, lb = 0)),   
+                  silent = TRUE)
+
+plot(fit)
+
+pp_check(fit)+
+  geom_vline(xintercept = 5.31, linetype = 2, color = "tomato")+
+  annotate(geom = "text", x =  7, y = 0.3, label = "[Stepanova 2011]")
+```
+
