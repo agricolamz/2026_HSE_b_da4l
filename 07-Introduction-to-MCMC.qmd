@@ -274,7 +274,16 @@ shiny::runGitHub("agricolamz/mcmc_shiny")
 
 Если на вашем компьютере не выходит, попробуйте <posit.cloud>
 
-### Регрессионный пример
+### Пример оценки параметра
+
+В данном разделе мы постараемся оценить параметры распределения используя MCMC. Мы будем делать это при помощи регресии:
+
+$$y_i = \hat{\beta_0} + \epsilon_i\mbox{, where } \epsilon_i \sim Normal(\mu = 0, \sigma)$$
+
+Однако это то же самое, что и сказать
+
+$$y_i =  Normal(\mu = \hat{\beta_0}, \sigma)$$
+
 
 ::: {.callout-note}
 В работе [@coretta2016] собраны [данные](https://raw.githubusercontent.com/agricolamz/2022_da4l/master/data/Coretta_2017_icelandic.csv) длительности исландских гласных. Отфильтруйте данные, произнесенные носителем `tt01` (переменная `speaker`), и смоделируйте длительность гласных (переменная `vowel.dur`) нормальным распределением используя в качестве априорного распределения нормальное распределение со средним 275 и стандартным отклонением 65 (основано на [@hillenbrand95]). 
@@ -290,7 +299,7 @@ read_csv("https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/master/da
 
 ```{r}
 library(brms)
-get_prior(vowel.dur ~ 0 + Intercept, 
+get_prior(vowel.dur ~ 1, 
           family = "normal",
           data = vowel_data)
 ```
@@ -300,13 +309,17 @@ get_prior(vowel.dur ~ 0 + Intercept,
 ```{r first_brm}
 #| cache: true
 
-normal_fit <- brm(vowel.dur ~ 0 + Intercept, 
-                  family = "normal",
+normal_fit <- brm(vowel.dur ~ 1, 
                   data = vowel_data,
-                  prior = c(prior(normal(275, 65), coef = Intercept)),
+                  family = gaussian(),
+                  prior = c(prior(normal(275, 65), class = Intercept, lb = 0),  # <1>
+                            prior(normal(0, 1), class = sigma, lb = 0)),        # <2>
                   silent = TRUE)
 normal_fit
 ```
+
+1. Аргументы `lb` и `ub` позволяют задать верхние и нижние границы априорного распределения.
+2. Сообщая `brms` информацию `class = sigma` мы уже говорим, что это стандартное отклонение, и что оно всегда положительное, но я решил добавить для единообразия.
 
 Визуализируем нашу модель:
 
@@ -317,8 +330,16 @@ plot(normal_fit)
 После того как мы сгенерировали наши распределения, мы можем их достать и что-нибудь посчитать:
 
 ```{r}
-as_draws_array(normal_fit) |> 
+as_draws_df(normal_fit) |> 
+  head()
+```
+
+Так как случайный член --- стандартная часть регрессионных моделей, он показывает два одинаковых параметра `b_Intercept` и `Intercept`.
+
+```{r}
+as_draws_df(normal_fit) |> 
   posterior::summarize_draws()
+
 as_draws_rvars(normal_fit)
 ```
 
