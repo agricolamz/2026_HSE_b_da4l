@@ -3,7 +3,11 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Эмпирическая байесовская оценка
+# Априорные распределения
+
+
+
+## Эмпирическая байесовская оценка
 
 ```{r setup07}
 #| include: false

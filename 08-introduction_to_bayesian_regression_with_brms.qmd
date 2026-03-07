@@ -5,17 +5,22 @@ editor_options:
 
 # Байесовский регрессионный анализ
 
-```{r setup11}
+```{r setup08}
 #| include: false
 
 knitr::opts_chunk$set(echo = TRUE, message = FALSE)
 library(tidyverse)
+library(brms)
 theme_set(theme_bw())
 ```
 
 ```{r}
 library(tidyverse)
 ```
+
+
+В основном, мы до этого момента пытались оценить параметры распределения некоторой переменной, однако чаще  всего в научной литературе мы пытаемся оценить связь нескольких переменных. Регрессионный анализ как раз такой метод, который позволяет оценить связь некоторой переменной от некоторого набора зависимых переменных.
+
 
 ## Основы регрессионного анализа
 
@@ -41,8 +46,8 @@ pBrackets::grid.brackets(815, 420, 815, 545, lwd=2, col="red")
 
 Когда мы используем регрессионный анализ, мы пытаемся оценить два параметра:
 
-- свободный член (intercept) -- значение $y$ при $x = 0$;
-- угловой коэффициент (slope) -- изменение $y$ при изменении $x$ на одну единицу.
+- свободный член (intercept) --- значение $y$ при $x = 0$;
+- угловой коэффициент (slope) --- изменение $y$ при изменении $x$ на одну единицу.
 
 $$y_i = \hat{\beta_0} + \hat{\beta_1}\times x_i + \epsilon_i$$
 
@@ -56,245 +61,137 @@ $$y_i = \hat{\beta_0} + \hat{\beta_1}\times x_i + \epsilon_i$$
 - независимость переменных;
 - независимость наблюдений друг от друга.
 
-## `brms`
+Припомнив предыдущий раздел, мы можем представить связь и в другой нотации:
 
-Для анализа возьмем датасет, который я составил из UD-корпусов и попробуем смоделировать связь между количеством слов в тексте и количеством уникальных слов ([закон Хердана-Хипса](https://en.wikipedia.org/wiki/Heaps%27_law)).
+$$y_{n} \sim Normal(\mu = \hat{\beta_0} + \hat{\beta_1}\times x_{n}, \sigma =  \epsilon)$$
 
-```{r}
-ud <- read_csv("https://raw.githubusercontent.com/agricolamz/udpipe_count_n_words_and_tokens/master/filtered_dataset.csv")
-glimpse(ud)
-```
+## Регрессионная модель в `brms`
 
-Для начала, нарушим кучу ограничений на применение регрессии и смоделируем модель для вот таких вот данных, взяв только тексты меньше 1500 слов:
-
-```{r}
-ud |>
-  filter(n_words < 1500) ->
-  ud
-
-ud |> 
-  ggplot(aes(n_words, n_tokens))+
-  geom_point()
-```
-
-### Модель только со свободным членом
+::: {.callout-note}
+В работе [@stepanova11] сообщается, что средняя скорость речи на русском языке составляет 5.31 слогов в секунду (стандартное отклонение 1.93). Скачайте [данные](https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/data/speech_tempo_zvenigorod.csv) корпуса г. Звенигород (<https://lingconlab.ru/zvenigorod/>) и оцените какой 
+эффект на скорость речи носителя `ea1976` оказывает разное количество гласных в высказывании, используя данные из [@stepanova11] в качестве априорного распределения. Визуализируйте получившееся распределение.
+:::
 
 ```{r}
 library(brms)
-parallel::detectCores()
 n_cores <- 15 # parallel::detectCores() - 1
 
-get_prior(n_tokens ~ 1, 
-          data = ud)
+read_csv("https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/data/speech_tempo_zvenigorod.csv") |> 
+  filter(speaker == "ea1976") ->
+  df
+
+get_prior(speech_tempo ~ n_vowels, 
+          family = gaussian(),
+          data = df) 
 ```
 
-Вот модель с встроенными априорными распределениями:
+Исходя из формулы выши, нам нужно определить априорное распределение для
 
-```{r brm_intercept}
+- свободного члена;
+- углового коэффециента;
+- распределения остатков.
+
+```{r fit1}
 #| cache: true
 
-fit_intercept <- brm(n_tokens ~ 1, 
-                     data = ud,
-                     cores = n_cores, 
-                     refresh = 0, 
-                     silent = TRUE)
+fit_normal <- brm(speech_tempo ~ n_vowels,
+                  data = df,
+                  family = gaussian(),
+                  cores = n_cores,
+                  prior = c(
+                    prior(normal(5.31, 1.93), class = "Intercept", lb = 0),
+                    prior(normal(0, 10), class = "b", lb = 0),
+                    prior(normal(0, 1), class = "sigma", lb = 0)))
 ```
 
-При желании встроенные априорные распределения можно не использовать и вставлять в аргумент `prior` априорные распределения по вашему желанию.
+После того, как функция отработала, мы можем проанализировать то, что мы получили в результате ее работы. Мы оценили три параметра:
 
 ```{r}
-fit_intercept
-plot(fit_intercept)
+plot(fit_normal)
 ```
 
-###  Проверка сходимости модели
+Стоит обратить внимание на сходимость цепей. Если все цепи накладываются друг на друга и выглядят как волосатые гусеницы --- все в порядке.
 
-Вы посторили регрессию, и самый простой способ проверить сходимость это визуально посмотреть на цепи:
-
-```{r convergence}
-#| cache: true
-#| echo: false
-#| message: false
-
-fit <- brm(mpg~disp,
-           data = mtcars,
-           cores = n_cores,
-           refresh = 0,
-           silent = TRUE)
-
-tibble(y = c(fit$fit@sim$samples[[1]]$b_disp,
-             fit$fit@sim$samples[[2]]$b_disp,
-             fit$fit@sim$samples[[1]]$b_disp,
-             fit$fit@sim$samples[[3]]$b_disp+0.03,
-             fit$fit@sim$samples[[1]]$b_disp,
-             fit$fit@sim$samples[[4]]$b_disp+sqrt(seq(0.001, 0, length = 2000))),
-       x = rep(1:2000, 6),
-       chain = rep(rep(c("chain_1", "chain_2"), each = 2000), 3),
-       type = rep(c("converged", "converged, but...", "one not converged"), each = 4000)) |> 
-  filter(x > 100) |> 
-  ggplot(aes(x, y, color = chain))+
-  geom_line(linewidth = 0.1)+
-  facet_wrap(~type)+
-  theme(legend.position = "none")+
-  labs(x = "", y = "")
+```{r}
+fit_normal
 ```
 
-Дальнейший фрагемнт взят из [документации Stan](https://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup) (Stan --- это один из популярнейших сэмплеров для MCMC и многого другого, который используется в `brms`).
-
-#### R-hat
+Метрики качества модели: R-hat, Bulk_ESS и Tail_ESS
 
 R-hat -- это диагностика сходимости, которая сравнивает оценку модели, которая получается внутри цепи и между цепями (введена в [@gelman92]). Если цепи не перемешались (например, если нет согласия внутри цепи и между цепями) R-hat будет иметь значение больше 1. Собственно для этого рекоммендуется запускать по-крайней мере 4 цепи. Stan возвращает что-то более сложное, что называется maximum of rank normalized split-R-hat и rank normalized folded-split-R-hat, однако мы не будем в этом разбиратсья, отсылаю к [статье](https://arxiv.org/abs/1903.08008) или [к посту](https://statmodeling.stat.columbia.edu/2019/03/19/maybe-its-time-to-let-the-old-ways-die-or-we-broke-r-hat-so-now-we-have-to-fix-it/) в блоге одного из авторов с объяснением.
 
-**Самое главное**: $\hat{R} \leq 1.01$ -- значит проблем со сходмиостью цепей не обнаружено.
+**Самое главное**: $\hat{R} \leq 1.05$ -- значит проблем со сходмиостью цепей не обнаружено.
 
-#### Effective sample size (ESS)
+Bulk ESS (Effective sample size) --- это оценка качества сэмплирования в середине апостериорного распределения, а Tail ESS --- в краях апостериорного распределения. Чем выше ESS -- тем лучше.
 
-Effective sample size (ESS) --- это оценка размера выборки достаточной для того, чтобы получить результат такой же точности при помощи случайной выборки из генеральной совокупности. Эту меру используют для оценки размера выборки, в анализе временных рядов и в байесовской статистике. Так как в байесовской статистике мы используем сэмпл из апостериорного распределения для статистического вывода, а значения в цепях коррелируют, то ESS пытается оценить, сколько нужно независимых сэмплов, чтобы получить такую же точность, что и результат MCMC. Чем выше ESS -- тем лучше.
-
-Stan возвращает две меры:
-
-- `Bulk-ESS`
-
-Roughly speaking, the effective sample size (ESS) of a quantity of interest captures how many independent draws contain the same amount of information as the dependent sample obtained by the MCMC algorithm. Clearly, the higher the ESS the better. Stan uses R-hat adjustment to use the between-chain information in computing the ESS. For example, in case of multimodal distributions with well-separated modes, this leads to an ESS estimate that is close to the number of distinct modes that are found.
-
-Bulk-ESS refers to the effective sample size based on the rank normalized draws. This does not directly compute the ESS relevant for computing the mean of the parameter, but instead computes a quantity that is well defined even if the chains do not have finite mean or variance. Overall bulk-ESS estimates the sampling efficiency for the location of the distribution (e.g. mean and median).
-
-Often quite smaller ESS would be sufficient for the desired estimation accuracy, but the estimation of ESS and convergence diagnostics themselves require higher ESS. We recommend requiring that the bulk-ESS is greater than 100 times the number of chains. For example, when running four chains, this corresponds to having a rank-normalized effective sample size of at least 400.
-
-- `Tail ESS`
-
-Tail-ESS computes the minimum of the effective sample sizes (ESS) of the 5% and 95% quantiles. Tail-ESS can help diagnosing problems due to different scales of the chains and slow mixing in the tails. See also general information about ESS above in description of bulk-ESS.
-
-### Опять модель только со свободным членом
-
-Давайте посмотрим на наши данные:
+Мы можем визуализировать полученную регрессию:
 
 ```{r}
-#| echo: false
-
-as_draws_array(fit_intercept) |> 
-  as_tibble() |> 
-  pivot_longer(values_to = "n_words", names_to = "chain", everything()) |> 
-  filter(str_detect(chain, "Intercept")) |> 
-  ggplot(aes(n_words))+
-  annotate(geom = "label", x = 800, y = 3000, label = "Ну, предположим, ква", size = 8)+
-  geom_histogram(data = ud, alpha = 0.4)+
-  geom_histogram(fill = "steelblue")+
-  labs(x = "количество слов", y = "", subtitle = "Серое -- данные, синие -- апостериорное распределение")
+fit_normal |> 
+  conditional_effects() |> 
+  plot(points=TRUE)
 ```
 
-[Если вам хочется вспомнить мем](https://cs.pikabu.ru/post_img/2013/05/08/10/1368028088_2034545627.jpg). Вот [еще один](https://demotions.ru/38886--nu-dopustim-myau.html).
-
-### Модель только с угловым коэффициентом
+Мы можем визуализировать, насколько скорость речи в данных соотносится с полученным распределением апостериорного распределения:
 
 ```{r}
-get_prior(n_tokens ~ n_words+0,
-          data = ud)
+fit_normal |> 
+  pp_check(type = "dens_overlay", ndraws = 50)
+
+fit_normal |> 
+  pp_check(type = "stat")
 ```
 
-```{r brm_slope}
-#| cache: true
-fit_slope <- brm(n_tokens ~ n_words+0, 
-                 data = ud,
-                 cores = n_cores,
-                 refresh = 0,
-                 silent = TRUE)
-```
+## Альтернативная модель
 
-```{r}
-fit_slope
-plot(fit_slope)
-```
+::: {.callout-note}
+В работе [@stepanova11] сообщается, что средняя скорость речи на русском языке составляет 5.31 слогов в секунду (стандартное отклонение 1.93). Скачайте [данные](https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/data/speech_tempo_zvenigorod.csv) корпуса г. Звенигород (<https://lingconlab.ru/zvenigorod/>) и оцените какой 
+эффект на скорость речи носителя `ea1976` оказывает разное количество гласных в высказывании, используя данные из [@stepanova11] в качестве априорного распределения. Визуализируйте получившееся распределение. Используйте логнормальную семью распреления для y.
+:::
 
-Давайте посмотрим на предсказания модели в том, виде, в каком их может интерпретировать не специалист по байесовской статистике:
 
-```{r}
-library(tidybayes)
-
-ud |> 
-  add_epred_draws(fit_slope, ndraws = 50) |>  
-  ggplot(aes(n_words, n_tokens))+
-  geom_point(alpha = 0.01)+
-  stat_lineribbon(aes(y = .epred), color = "red") 
-```
-
-### Модель с угловым коэффициентом и свободным членом
-
-```{r}
-get_prior(n_tokens ~ n_words,
-          data = ud)
-```
-
-```{r brm_slope_intercept}
-#| cache: true
-fit_slope_intercept <- brm(n_tokens ~ n_words,
-                           data = ud,
-                           cores = n_cores, refresh = 0, silent = TRUE)
-```
-
-```{r}
-fit_slope_intercept
-plot(fit_slope_intercept)
-
-ud |> 
-  add_epred_draws(fit_slope_intercept, ndraws = 50) |>  
-  ggplot(aes(n_words, n_tokens))+
-  geom_point(alpha = 0.01)+
-  stat_lineribbon(aes(y = .epred), color = "red") 
-```
-
-### Модель со смешанными эффектами
-
-В данных есть группировка по языкам, которую мы все это время игнорировали. Давайте сделаем модель со смешанными эффектами:
-
-```{r}
-get_prior(n_tokens ~ n_words+(1|language),
-          data = ud)
-```
-
-```{r mixed}
+```{r fit2}
 #| cache: true
 
-fit_mixed <- brm(n_tokens ~ n_words + (1|language),
-                 data = ud,
-                 cores = n_cores, refresh = 0, silent = TRUE)
+fit_lognormal <- brm(speech_tempo ~ n_vowels, 
+                     data = df, 
+                     family = lognormal(),
+                     cores = n_cores,
+           prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0), 
+                     prior(normal(0, 10), class = "b", lb = 0),
+                     prior(normal(0, 1), class = "sigma", lb = 0)))
 ```
 
 ```{r}
-fit_mixed
-plot(fit_mixed)
-ud |> 
-  add_epred_draws(fit_mixed, ndraws = 50) |>  
-  ggplot(aes(n_words, n_tokens))+
-  geom_point(alpha = 0.01)+
-  stat_lineribbon(aes(y = .epred), color = "red") +
-  facet_wrap(~language)
+plot(fit_lognormal)
 ```
 
-То, что получилось учитывает общий эффект всех языков: посмотрите на каталанский. Если построить модель по каждому языку, то получится совсем другая картина:
+```{r}
+fit_lognormal |> 
+  conditional_effects() |> 
+  plot(points=TRUE)
+```
 
 ```{r}
-ud |> 
-  ggplot(aes(n_words, n_tokens))+
-  geom_smooth(method = "lm") +
-  geom_point(alpha = 0.3)+
-  facet_wrap(~language)
+pp_check(fit_lognormal,
+         type = "stat")
 ```
 
 ::: {.callout-note}
-В работе [@coretta2016] собраны [данные](https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/master/data/Coretta_2017_icelandic.csv) длительности исландских гласных. Используя байесовскую регрессию с априорными распределениями по умолчанию, смоделируйте длительность гласного (`vowel.dur`) в зависимости от аспирированности (`aspiration`) учитывая эффект носителя. Визуализируйте результаты модели.
+В работе [@coretta2016] собраны [данные](https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/master/data/Coretta_2017_icelandic.csv) длительности исландских гласных. Используя байесовскую регрессию с априорными распределениями по умолчанию, смоделируйте длительность гласного (`vowel.dur`) в зависимости от придыхания (`aspiration`) у носителя `tt01`. Визуализируйте результаты модели.
 :::
 
 ```{r}
 #| include: false
-vowels <- read_csv("https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/master/data/Coretta_2017_icelandic.csv")
-
+read_csv("https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/master/data/Coretta_2017_icelandic.csv") |> 
+  filter(speaker == "tt01") -> 
+  vowels
+  
 vowels |> 
   ggplot(aes(aspiration, vowel.dur))+
-  geom_violin()+
-  facet_wrap(~speaker)
+  geom_violin()
 
-get_prior(vowel.dur ~ aspiration+(1|speaker),
+get_prior(vowel.dur ~ aspiration,
           data = vowels)
 ```
 
@@ -302,22 +199,97 @@ get_prior(vowel.dur ~ aspiration+(1|speaker),
 #| include: false
 #| cache: true
 
-vowels_fit <- brm(vowel.dur ~ aspiration+(1|speaker),
-                  data = vowels)
+vowels_fit <- brm(vowel.dur ~ aspiration,
+                  data = vowels,
+                  cores = n_cores)
+vowels_fit
+
+plot(vowels_fit)
+
+vowels_fit |> 
+  conditional_effects() |> 
+  plot(points=TRUE)
 ```
 
-```{r}
-#| include: false
-vowels_fit
-plot(vowels_fit)
-```
+## Иерархические модели
+
+Одним из важных предположений регрессионного анализа является независимость наблюдений друг от друга. Однако часто в данных можно встретить различные группировки наблюдений, которые следует учитывать. Байесовское моделирование может по-разному учитывать эти эффекты.
 
 ```{r}
 #| echo: false
-vowels |> 
-  add_epred_draws(vowels_fit, ndraws = 50) |>  
-  ggplot(aes(aspiration, vowel.dur))+
-  geom_violin()+
-  stat_lineribbon(aes(y = .epred)) +
-  facet_wrap(~speaker)
+#| fig-cap: "Из 'Introduction to Bayesian Data Analysis for Cognitive Science' Bruno Nicenboim, Daniel J. Schad, and Shravan Vasishth"
+
+knitr::include_graphics("images/dags1-1.png")
 ```
+
+
+```{r}
+df <- read_csv("https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/data/speech_tempo_zvenigorod.csv")
+```
+
+```{r hierarchical}
+#| cache: true
+
+fit_hierarchical <- brm(speech_tempo ~ (1|speaker),
+                        data = df,
+                        family = gaussian(),
+                        cores = n_cores)
+```
+
+```{r}
+fit_hierarchical
+
+plot(fit_hierarchical)
+```
+
+
+## Complete pooling model
+
+
+```{r}
+#| echo: false
+#| fig-cap: "Из 'Introduction to Bayesian Data Analysis for Cognitive Science' Bruno Nicenboim, Daniel J. Schad, and Shravan Vasishth"
+
+knitr::include_graphics("images/dags3-1.png")
+```
+
+```{r complete_pooling}
+#| cache: true
+
+fit_complete_pooling <- brm(speech_tempo ~ 1,
+                            data = df,
+                            family = gaussian(),
+                            cores = n_cores)
+```
+
+```{r}
+fit_complete_pooling
+
+plot(fit_complete_pooling)
+```
+
+
+## No pooling model
+
+```{r}
+#| echo: false
+#| fig-cap: "Из 'Introduction to Bayesian Data Analysis for Cognitive Science' Bruno Nicenboim, Daniel J. Schad, and Shravan Vasishth"
+
+knitr::include_graphics("images/dags2-1.png")
+```
+
+```{r no_pooling}
+#| cache: true
+
+fit_no_pooling <- brm(speech_tempo ~ 0 + speaker,
+                      data = df,
+                      family = gaussian(),
+                      cores = n_cores)
+```
+
+```{r}
+fit_no_pooling
+
+plot(fit_no_pooling)
+```
+

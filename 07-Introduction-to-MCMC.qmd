@@ -282,7 +282,7 @@ $$y_i = \hat{\beta_0} + \epsilon_i\mbox{, where } \epsilon_i \sim Normal(\mu = 0
 
 Однако это то же самое, что и сказать
 
-$$y_i =  Normal(\mu = \hat{\beta_0}, \sigma)$$
+$$y_i \sim   Normal(\mu = \hat{\beta_0}, \sigma)$$
 
 
 ::: {.callout-note}
@@ -312,8 +312,8 @@ get_prior(vowel.dur ~ 1,
 normal_fit <- brm(vowel.dur ~ 1, 
                   data = vowel_data,
                   family = gaussian(),
-                  prior = c(prior(normal(275, 65), class = Intercept, lb = 0),  # <1>
-                            prior(normal(0, 1), class = sigma, lb = 0)),        # <2>
+                  prior = c(prior(normal(275, 65), class = "Intercept", lb = 0),  # <1>
+                            prior(normal(0, 1), class = "sigma", lb = 0)),        # <2>
                   silent = TRUE)
 normal_fit
 ```
@@ -368,8 +368,8 @@ get_prior(speech_tempo ~ 1,
 fit <- brm(speech_tempo ~ 1, 
            data = df, 
            family = gaussian(),
-           prior = c(prior(normal(5.31, 1.93), class = Intercept, lb = 0), 
-                     prior(normal(0, 1), class = sigma, lb = 0)),   
+           prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0), 
+                     prior(normal(0, 1), class = "sigma", lb = 0)),   
                   silent = TRUE)
 ```
 
