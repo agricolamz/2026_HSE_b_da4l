@@ -98,10 +98,10 @@ fit_normal <- brm(speech_tempo ~ n_vowels,
                   data = df,
                   family = gaussian(),
                   cores = n_cores,
-                  prior = c(
-                    prior(normal(5.31, 1.93), class = "Intercept", lb = 0),
-                    prior(normal(0, 10), class = "b", lb = 0),
-                    prior(normal(0, 1), class = "sigma", lb = 0)))
+                  silent = TRUE,
+                  prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0),
+                            prior(normal(0, 1), class = "sigma", lb = 0),
+                            prior(normal(0, 10), class = "b", lb = 0)))
 ```
 
 После того, как функция отработала, мы можем проанализировать то, что мы получили в результате ее работы. Мы оценили три параметра:
@@ -157,9 +157,10 @@ fit_lognormal <- brm(speech_tempo ~ n_vowels,
                      data = df, 
                      family = lognormal(),
                      cores = n_cores,
-           prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0), 
-                     prior(normal(0, 10), class = "b", lb = 0),
-                     prior(normal(0, 1), class = "sigma", lb = 0)))
+                     silent = TRUE,
+                     prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0), 
+                               prior(normal(0, 1), class = "sigma", lb = 0),
+                               prior(normal(0, 10), class = "b", lb = 0)))
 ```
 
 ```{r}
@@ -201,7 +202,8 @@ get_prior(vowel.dur ~ aspiration,
 
 vowels_fit <- brm(vowel.dur ~ aspiration,
                   data = vowels,
-                  cores = n_cores)
+                  cores = n_cores,
+                  silent = TRUE)
 vowels_fit
 
 plot(vowels_fit)
@@ -230,10 +232,18 @@ df <- read_csv("https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/mas
 ```{r hierarchical}
 #| cache: true
 
+get_prior(speech_tempo ~ (1|speaker),
+                        data = df,
+                        family = gaussian())
+
 fit_hierarchical <- brm(speech_tempo ~ (1|speaker),
                         data = df,
                         family = gaussian(),
-                        cores = n_cores)
+                        cores = n_cores,
+                        silent = TRUE,
+                        prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0),
+                                  prior(normal(2, 5), class = "sigma", lb = 0),
+                                  prior(normal(10, 10), class = "sd")))
 ```
 
 ```{r}
@@ -241,7 +251,6 @@ fit_hierarchical
 
 plot(fit_hierarchical)
 ```
-
 
 ## Complete pooling model
 
@@ -259,7 +268,8 @@ knitr::include_graphics("images/dags3-1.png")
 fit_complete_pooling <- brm(speech_tempo ~ 1,
                             data = df,
                             family = gaussian(),
-                            cores = n_cores)
+                            cores = n_cores,
+                            silent = TRUE)
 ```
 
 ```{r}
@@ -284,7 +294,10 @@ knitr::include_graphics("images/dags2-1.png")
 fit_no_pooling <- brm(speech_tempo ~ 0 + speaker,
                       data = df,
                       family = gaussian(),
-                      cores = n_cores)
+                      cores = n_cores,
+                      silent = TRUE,
+                      prior = c(prior(normal(2, 5), class = "sigma", lb = 0),
+                                prior(normal(0, 10), class = "b", lb = 0)))
 ```
 
 ```{r}
