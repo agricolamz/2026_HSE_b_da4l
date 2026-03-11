@@ -21,7 +21,6 @@ library(tidyverse)
 
 В основном, мы до этого момента пытались оценить параметры распределения некоторой переменной, однако чаще  всего в научной литературе мы пытаемся оценить связь нескольких переменных. Регрессионный анализ как раз такой метод, который позволяет оценить связь некоторой переменной от некоторого набора зависимых переменных.
 
-
 ## Основы регрессионного анализа
 
 ```{r}
@@ -68,8 +67,7 @@ $$y_{n} \sim Normal(\mu = \hat{\beta_0} + \hat{\beta_1}\times x_{n}, \sigma =  \
 ## Регрессионная модель в `brms`
 
 ::: {.callout-note}
-В работе [@stepanova11] сообщается, что средняя скорость речи на русском языке составляет 5.31 слогов в секунду (стандартное отклонение 1.93). Скачайте [данные](https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/data/speech_tempo_zvenigorod.csv) корпуса г. Звенигород (<https://lingconlab.ru/zvenigorod/>) и оцените какой 
-эффект на скорость речи носителя `ea1976` оказывает разное количество гласных в высказывании, используя данные из [@stepanova11] в качестве априорного распределения. Визуализируйте получившееся распределение.
+В работе [@stepanova11] сообщается, что средняя скорость речи на русском языке составляет 5.31 слогов в секунду (стандартное отклонение 1.93). Скачайте [данные](https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/data/speech_tempo_zvenigorod.csv) корпуса г. Звенигород (<https://lingconlab.ru/zvenigorod/>) и оцените какой  эффект на скорость речи носителя `ea1976` оказывает разное количество гласных в высказывании, используя данные из [@stepanova11] в качестве априорного распределения. Визуализируйте получившееся распределение.
 :::
 
 ```{r}
@@ -85,7 +83,7 @@ get_prior(speech_tempo ~ n_vowels,
           data = df) 
 ```
 
-Исходя из формулы выши, нам нужно определить априорное распределение для
+Исходя из формулы выше, нам нужно определить априорное распределение для
 
 - свободного члена;
 - углового коэффециента;
@@ -94,26 +92,26 @@ get_prior(speech_tempo ~ n_vowels,
 ```{r fit1}
 #| cache: true
 
-fit_normal <- brm(speech_tempo ~ n_vowels,
-                  data = df,
-                  family = gaussian(),
-                  cores = n_cores,
-                  silent = TRUE,
-                  prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0),
-                            prior(normal(0, 1), class = "sigma", lb = 0),
-                            prior(normal(0, 10), class = "b", lb = 0)))
+fit1 <- brm(speech_tempo ~ n_vowels,
+            data = df,
+            family = gaussian(),
+            cores = n_cores,
+            silent = TRUE,
+            prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0),
+                      prior(normal(0, 1), class = "sigma", lb = 0),
+                      prior(normal(0, 10), class = "b", lb = 0)))
 ```
 
 После того, как функция отработала, мы можем проанализировать то, что мы получили в результате ее работы. Мы оценили три параметра:
 
 ```{r}
-plot(fit_normal)
+plot(fit1)
 ```
 
 Стоит обратить внимание на сходимость цепей. Если все цепи накладываются друг на друга и выглядят как волосатые гусеницы --- все в порядке.
 
 ```{r}
-fit_normal
+fit1
 ```
 
 Метрики качества модели: R-hat, Bulk_ESS и Tail_ESS
@@ -127,7 +125,7 @@ Bulk ESS (Effective sample size) --- это оценка качества сэм
 Мы можем визуализировать полученную регрессию:
 
 ```{r}
-fit_normal |> 
+fit1 |> 
   conditional_effects() |> 
   plot(points=TRUE)
 ```
@@ -135,48 +133,73 @@ fit_normal |>
 Мы можем визуализировать, насколько скорость речи в данных соотносится с полученным распределением апостериорного распределения:
 
 ```{r}
-fit_normal |> 
+fit1 |> 
   pp_check(type = "dens_overlay", ndraws = 50)
 
-fit_normal |> 
+fit1 |> 
   pp_check(type = "stat")
 ```
 
+Если хочется предсказать какие-то значения, то можно использовать функцию `predict()`, которая возьмет выборки из апостериорного распределения:
+
+```{r}
+predict(fit1, newdata = tibble(n_vowels = c(10, 20)))
+```
+
+
 ## Альтернативная модель
 
-::: {.callout-note}
-В работе [@stepanova11] сообщается, что средняя скорость речи на русском языке составляет 5.31 слогов в секунду (стандартное отклонение 1.93). Скачайте [данные](https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/data/speech_tempo_zvenigorod.csv) корпуса г. Звенигород (<https://lingconlab.ru/zvenigorod/>) и оцените какой 
-эффект на скорость речи носителя `ea1976` оказывает разное количество гласных в высказывании, используя данные из [@stepanova11] в качестве априорного распределения. Визуализируйте получившееся распределение. Используйте логнормальную семью распреления для y.
-:::
+Мы можем использовать тот же самый код, но попробовать в качестве переменной использовать логорифм количества гласных. Для того, чтобы использовать какие-то арифемтические операции внутри регрессионной формулы, нужно использовать функцию `I()` или сделать какие-то модификации переменных до того, как использовать в регрессии. 
+
+```{r}
+get_prior(speech_tempo ~ I(log(n_vowels)), 
+          data = df, 
+          family = gaussian())
+```
 
 
 ```{r fit2}
 #| cache: true
-
-fit_lognormal <- brm(speech_tempo ~ n_vowels, 
-                     data = df, 
-                     family = lognormal(),
-                     cores = n_cores,
-                     silent = TRUE,
-                     prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0), 
-                               prior(normal(0, 1), class = "sigma", lb = 0),
-                               prior(normal(0, 10), class = "b", lb = 0)))
+fit2 <- brm(speech_tempo ~ I(log(n_vowels)), 
+            data = df,
+            family = gaussian(),
+            cores = n_cores,
+            silent = TRUE,
+            prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0), 
+                      prior(normal(0, 1), class = "sigma", lb = 0),
+                      prior(normal(0, 10), class = "b", lb = 0)))
 ```
 
 ```{r}
-plot(fit_lognormal)
+plot(fit2)
 ```
 
 ```{r}
-fit_lognormal |> 
+fit2 |> 
   conditional_effects() |> 
   plot(points=TRUE)
 ```
 
 ```{r}
-pp_check(fit_lognormal,
-         type = "stat")
+fit2 |> 
+  pp_check(type = "dens_overlay", ndraws = 50)
+
+fit2 |> 
+  pp_check(type = "stat")
 ```
+
+В работах [@vehtari2017; vehtari2024] описан метод `loo`, который оценивает leave-one-out кроссвалидацию, которую можно использовать для сравнения моделей.
+
+```{r}
+fit1 <- add_criterion(fit1, "loo")
+fit1$criteria$loo
+fit2 <- add_criterion(fit2, "loo")
+fit2$criteria$loo
+loo_compare(fit1, fit2, criterion = "loo")
+plot(fit2$criteria$loo)
+```
+
+Большее значение ELPD стоит интепретировать как лучшую предсказательную способность модели. Подробнее про эту метрику можно прочитать, запустив `help('pareto-k-diagnostic')`.
 
 ::: {.callout-note}
 В работе [@coretta2016] собраны [данные](https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/master/data/Coretta_2017_icelandic.csv) длительности исландских гласных. Используя байесовскую регрессию с априорными распределениями по умолчанию, смоделируйте длительность гласного (`vowel.dur`) в зависимости от придыхания (`aspiration`) у носителя `tt01`. Визуализируйте результаты модели.

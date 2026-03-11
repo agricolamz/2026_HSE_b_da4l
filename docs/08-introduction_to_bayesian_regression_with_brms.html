@@ -363,25 +363,39 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>Исходя из формулы выши, нам нужно определить априорное распределение для</p>
+<p>Исходя из формулы выше, нам нужно определить априорное распределение для</p>
 <ul>
 <li>свободного члена;</li>
 <li>углового коэффециента;</li>
 <li>распределения остатков.</li>
 </ul>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fit_normal <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> n_vowels,</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> df,</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">cores =</span> n_cores,</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">silent =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="fl">5.31</span>, <span class="fl">1.93</span>), <span class="at">class =</span> <span class="st">"Intercept"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">class =</span> <span class="st">"sigma"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">class =</span> <span class="st">"b"</span>, <span class="at">lb =</span> <span class="dv">0</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> n_vowels,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> df,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">cores =</span> n_cores,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">silent =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="fl">5.31</span>, <span class="fl">1.93</span>), <span class="at">class =</span> <span class="st">"Intercept"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">class =</span> <span class="st">"sigma"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">class =</span> <span class="st">"b"</span>, <span class="at">lb =</span> <span class="dv">0</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Running /usr/lib/R/bin/R CMD SHLIB foo.c
+using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0’
+gcc -I"/usr/share/R/include" -DNDEBUG   -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/Rcpp/include/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/unsupported"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/BH/include" -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/StanHeaders/include/src/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/StanHeaders/include/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppParallel/include/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1       -fpic  -g -O2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=/build/r-base-FPSnzf/r-base-4.3.3=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=/build/r-base-FPSnzf/r-base-4.3.3=/usr/src/r-base-4.3.3-2build2 -Wdate-time -D_FORTIFY_SOURCE=3  -c foo.c -o foo.o
+In file included from /home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/Eigen/Core:19,
+                 from /home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/Eigen/Dense:1,
+                 from /home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22,
+                 from &lt;command-line&gt;:
+/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/Eigen/src/Core/util/Macros.h:679:10: fatal error: cmath: No such file or directory
+  679 | #include &lt;cmath&gt;
+      |          ^~~~~~~
+compilation terminated.
+make: *** [/usr/lib/R/etc/Makeconf:191: foo.o] Error 1</code></pre>
+</div>
 </div>
 <p>После того, как функция отработала, мы можем проанализировать то, что мы получили в результате ее работы. Мы оценили три параметра:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_normal)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit1)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -392,7 +406,7 @@ window.Quarto = {
 </div>
 <p>Стоит обратить внимание на сходимость цепей. Если все цепи накладываются друг на друга и выглядят как волосатые гусеницы — все в порядке.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fit_normal</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fit1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> Family: gaussian 
   Links: mu = identity 
@@ -403,12 +417,12 @@ Formula: speech_tempo ~ n_vowels
 
 Regression Coefficients:
           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-Intercept     2.59      0.08     2.45     2.74 1.00     4102     3211
-n_vowels      0.12      0.01     0.11     0.12 1.00     3635     2840
+Intercept     2.59      0.07     2.45     2.74 1.00     3752     2857
+n_vowels      0.12      0.01     0.11     0.13 1.00     3799     2621
 
 Further Distributional Parameters:
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sigma     1.09      0.03     1.04     1.15 1.00     3386     2745
+sigma     1.09      0.03     1.04     1.15 1.00     3800     2730
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -421,9 +435,9 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <p>Bulk ESS (Effective sample size) — это оценка качества сэмплирования в середине апостериорного распределения, а Tail ESS — в краях апостериорного распределения. Чем выше ESS – тем лучше.</p>
 <p>Мы можем визуализировать полученную регрессию:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fit_normal <span class="sc">|&gt;</span> </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conditional_effects</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="at">points=</span><span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fit1 <span class="sc">|&gt;</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conditional_effects</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="at">points=</span><span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -434,8 +448,8 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
 <p>Мы можем визуализировать, насколько скорость речи в данных соотносится с полученным распределением апостериорного распределения:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fit_normal <span class="sc">|&gt;</span> </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pp_check</span>(<span class="at">type =</span> <span class="st">"dens_overlay"</span>, <span class="at">ndraws =</span> <span class="dv">50</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fit1 <span class="sc">|&gt;</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pp_check</span>(<span class="at">type =</span> <span class="st">"dens_overlay"</span>, <span class="at">ndraws =</span> <span class="dv">50</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -443,8 +457,8 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </figure>
 </div>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fit_normal <span class="sc">|&gt;</span> </span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pp_check</span>(<span class="at">type =</span> <span class="st">"stat"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fit1 <span class="sc">|&gt;</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pp_check</span>(<span class="at">type =</span> <span class="st">"stat"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -453,54 +467,57 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
 </div>
 </div>
+<p>Если хочется предсказать какие-то значения, то можно использовать функцию <code>predict()</code>, которая возьмет выборки из апостериорного распределения:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(fit1, <span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">n_vowels =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">20</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Estimate Est.Error     Q2.5    Q97.5
+[1,] 3.756987  1.106683 1.570051 5.870065
+[2,] 4.871424  1.090581 2.697355 6.946229</code></pre>
+</div>
+</div>
 </section>
 <section id="альтернативная-модель" class="level2" data-number="8.3">
 <h2 data-number="8.3" class="anchored" data-anchor-id="альтернативная-модель"><span class="header-section-number">8.3</span> Альтернативная модель</h2>
-<div class="callout callout-style-simple callout-note no-icon">
-<div class="callout-body d-flex">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-body-container">
-<p>В работе <span class="citation" data-cites="stepanova11">(<a href="#ref-stepanova11" role="doc-biblioref">Stepanova 2011</a>)</span> сообщается, что средняя скорость речи на русском языке составляет 5.31 слогов в секунду (стандартное отклонение 1.93). Скачайте <a href="https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/data/speech_tempo_zvenigorod.csv">данные</a> корпуса г. Звенигород (<a href="https://lingconlab.ru/zvenigorod/" class="uri">https://lingconlab.ru/zvenigorod/</a>) и оцените какой эффект на скорость речи носителя <code>ea1976</code> оказывает разное количество гласных в высказывании, используя данные из <span class="citation" data-cites="stepanova11">(<a href="#ref-stepanova11" role="doc-biblioref">Stepanova 2011</a>)</span> в качестве априорного распределения. Визуализируйте получившееся распределение. Используйте логнормальную семью распреления для y.</p>
-</div>
-</div>
-</div>
+<p>Мы можем использовать тот же самый код, но попробовать в качестве переменной использовать логорифм количества гласных. Для того, чтобы использовать какие-то арифемтические операции внутри регрессионной формулы, нужно использовать функцию <code>I()</code> или сделать какие-то модификации переменных до того, как использовать в регрессии.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fit_lognormal <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> n_vowels, </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data =</span> df, </span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">family =</span> <span class="fu">lognormal</span>(),</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">cores =</span> n_cores,</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">silent =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="fl">5.31</span>, <span class="fl">1.93</span>), <span class="at">class =</span> <span class="st">"Intercept"</span>, <span class="at">lb =</span> <span class="dv">0</span>), </span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>                               <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">class =</span> <span class="st">"sigma"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>                               <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">class =</span> <span class="st">"b"</span>, <span class="at">lb =</span> <span class="dv">0</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_lognormal)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_prior</span>(speech_tempo <span class="sc">~</span> <span class="fu">I</span>(<span class="fu">log</span>(n_vowels)), </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">data =</span> df, </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">family =</span> <span class="fu">gaussian</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["prior"],"name":[1],"type":["chr"],"align":["left"]},{"label":["class"],"name":[2],"type":["chr"],"align":["left"]},{"label":["coef"],"name":[3],"type":["chr"],"align":["left"]},{"label":["group"],"name":[4],"type":["chr"],"align":["left"]},{"label":["resp"],"name":[5],"type":["chr"],"align":["left"]},{"label":["dpar"],"name":[6],"type":["chr"],"align":["left"]},{"label":["nlpar"],"name":[7],"type":["chr"],"align":["left"]},{"label":["lb"],"name":[8],"type":["chr"],"align":["left"]},{"label":["ub"],"name":[9],"type":["chr"],"align":["left"]},{"label":["tag"],"name":[10],"type":["chr"],"align":["left"]},{"label":["source"],"name":[11],"type":["chr"],"align":["left"]}],"data":[{"1":"","2":"b","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"default"},{"1":"","2":"b","3":"Ilogn_vowels","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"default"},{"1":"student_t(3, 4.1, 2.5)","2":"Intercept","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"default"},{"1":"student_t(3, 0, 2.5)","2":"sigma","3":"","4":"","5":"","6":"","7":"","8":"0","9":"","10":"","11":"default"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
 </div>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>fit_lognormal <span class="sc">|&gt;</span> </span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conditional_effects</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="at">points=</span><span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>fit2 <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> <span class="fu">I</span>(<span class="fu">log</span>(n_vowels)), </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> df,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">cores =</span> n_cores,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">silent =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="fl">5.31</span>, <span class="fl">1.93</span>), <span class="at">class =</span> <span class="st">"Intercept"</span>, <span class="at">lb =</span> <span class="dv">0</span>), </span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">class =</span> <span class="st">"sigma"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">class =</span> <span class="st">"b"</span>, <span class="at">lb =</span> <span class="dv">0</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Running /usr/lib/R/bin/R CMD SHLIB foo.c
+using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0’
+gcc -I"/usr/share/R/include" -DNDEBUG   -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/Rcpp/include/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/unsupported"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/BH/include" -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/StanHeaders/include/src/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/StanHeaders/include/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppParallel/include/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1       -fpic  -g -O2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=/build/r-base-FPSnzf/r-base-4.3.3=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=/build/r-base-FPSnzf/r-base-4.3.3=/usr/src/r-base-4.3.3-2build2 -Wdate-time -D_FORTIFY_SOURCE=3  -c foo.c -o foo.o
+In file included from /home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/Eigen/Core:19,
+                 from /home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/Eigen/Dense:1,
+                 from /home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22,
+                 from &lt;command-line&gt;:
+/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/Eigen/src/Core/util/Macros.h:679:10: fatal error: cmath: No such file or directory
+  679 | #include &lt;cmath&gt;
+      |          ^~~~~~~
+compilation terminated.
+make: *** [/usr/lib/R/etc/Makeconf:191: foo.o] Error 1</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pp_check</span>(fit_lognormal,</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">type =</span> <span class="st">"stat"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -509,6 +526,90 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
 </div>
 </div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fit2 <span class="sc">|&gt;</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conditional_effects</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="at">points=</span><span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fit2 <span class="sc">|&gt;</span> </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pp_check</span>(<span class="at">type =</span> <span class="st">"dens_overlay"</span>, <span class="at">ndraws =</span> <span class="dv">50</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fit2 <span class="sc">|&gt;</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pp_check</span>(<span class="at">type =</span> <span class="st">"stat"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-12-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>В работах [<span class="citation" data-cites="vehtari2017">Vehtari et al. (<a href="#ref-vehtari2017" role="doc-biblioref">2017</a>)</span>; vehtari2024] описан метод <code>loo</code>, который оценивает leave-one-out кроссвалидацию, которую можно использовать для сравнения моделей.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">add_criterion</span>(fit1, <span class="st">"loo"</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>fit1<span class="sc">$</span>criteria<span class="sc">$</span>loo</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Computed from 4000 by 786 log-likelihood matrix.
+
+         Estimate   SE
+elpd_loo  -1187.2 22.0
+p_loo         3.2  0.3
+looic      2374.4 44.0
+------
+MCSE of elpd_loo is 0.0.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.9, 1.2]).
+
+All Pareto k estimates are good (k &lt; 0.7).
+See help('pareto-k-diagnostic') for details.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>fit2 <span class="ot">&lt;-</span> <span class="fu">add_criterion</span>(fit2, <span class="st">"loo"</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>fit2<span class="sc">$</span>criteria<span class="sc">$</span>loo</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Computed from 4000 by 786 log-likelihood matrix.
+
+         Estimate   SE
+elpd_loo  -1089.2 24.2
+p_loo         3.0  0.4
+looic      2178.4 48.3
+------
+MCSE of elpd_loo is 0.0.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.9, 1.2]).
+
+All Pareto k estimates are good (k &lt; 0.7).
+See help('pareto-k-diagnostic') for details.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">loo_compare</span>(fit1, fit2, <span class="at">criterion =</span> <span class="st">"loo"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     elpd_diff se_diff
+fit2   0.0       0.0  
+fit1 -98.0      10.4  </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit2<span class="sc">$</span>criteria<span class="sc">$</span>loo)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Большее значение ELPD стоит интепретировать как лучшую предсказательную способность модели. Подробнее про эту метрику можно прочитать, запустив <code>help('pareto-k-diagnostic')</code>.</p>
 <div class="callout callout-style-simple callout-note no-icon">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
@@ -534,12 +635,12 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/data/speech_tempo_zvenigorod.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/data/speech_tempo_zvenigorod.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_prior</span>(speech_tempo <span class="sc">~</span> (<span class="dv">1</span><span class="sc">|</span>speaker),</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">data =</span> df,</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">family =</span> <span class="fu">gaussian</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_prior</span>(speech_tempo <span class="sc">~</span> (<span class="dv">1</span><span class="sc">|</span>speaker),</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">data =</span> df,</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">family =</span> <span class="fu">gaussian</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -547,14 +648,14 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
   </script>
 </div>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> (<span class="dv">1</span><span class="sc">|</span>speaker),</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">data =</span> df,</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">cores =</span> n_cores,</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">silent =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                        <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="fl">5.31</span>, <span class="fl">1.93</span>), <span class="at">class =</span> <span class="st">"Intercept"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">5</span>), <span class="at">class =</span> <span class="st">"sigma"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">10</span>, <span class="dv">10</span>), <span class="at">class =</span> <span class="st">"sd"</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> (<span class="dv">1</span><span class="sc">|</span>speaker),</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">data =</span> df,</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">cores =</span> n_cores,</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">silent =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>                        <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="fl">5.31</span>, <span class="fl">1.93</span>), <span class="at">class =</span> <span class="st">"Intercept"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">5</span>), <span class="at">class =</span> <span class="st">"sigma"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">10</span>, <span class="dv">10</span>), <span class="at">class =</span> <span class="st">"sd"</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: There were 4 divergent transitions after warmup. See
 https://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
@@ -565,7 +666,7 @@ to find out why this is a problem and how to eliminate them.</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: There were 4 divergent transitions after warmup. Increasing
 adapt_delta above 0.8 may help. See
@@ -596,11 +697,11 @@ Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
 scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_hierarchical)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_hierarchical)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -619,14 +720,14 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>fit_complete_pooling <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">data =</span> df,</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">cores =</span> n_cores,</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                            <span class="at">silent =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>fit_complete_pooling <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">data =</span> df,</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">cores =</span> n_cores,</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>                            <span class="at">silent =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>fit_complete_pooling</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>fit_complete_pooling</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> Family: gaussian 
   Links: mu = identity 
@@ -647,11 +748,11 @@ Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
 scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_complete_pooling)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_complete_pooling)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -670,16 +771,16 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>fit_no_pooling <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> speaker,</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">data =</span> df,</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">cores =</span> n_cores,</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                      <span class="at">silent =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">5</span>), <span class="at">class =</span> <span class="st">"sigma"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">class =</span> <span class="st">"b"</span>, <span class="at">lb =</span> <span class="dv">0</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>fit_no_pooling <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> speaker,</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">data =</span> df,</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">cores =</span> n_cores,</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>                      <span class="at">silent =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">5</span>), <span class="at">class =</span> <span class="st">"sigma"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">class =</span> <span class="st">"b"</span>, <span class="at">lb =</span> <span class="dv">0</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>fit_no_pooling</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>fit_no_pooling</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> Family: gaussian 
   Links: mu = identity 
@@ -708,18 +809,18 @@ Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
 scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_no_pooling)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_no_pooling)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-18-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-21-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -735,6 +836,9 @@ Gelman, A., and D. B. Rubin. 1992. <span>“Inference from Iterative Simulation 
 </div>
 <div id="ref-stepanova11" class="csl-entry" role="listitem">
 Stepanova, S. 2011. <span>“Russian Spontaneous Speech Rate-Based on the <span>S</span>peech Corpus of <span>R</span>ussian Everyday Interaction.”</span> <em>ICPhS</em>, 1902–5.
+</div>
+<div id="ref-vehtari2017" class="csl-entry" role="listitem">
+Vehtari, Aki, Andrew Gelman, and Jonah Gabry. 2017. <span>“Practical Bayesian Model Evaluation Using Leave-One-Out Cross-Validation and WAIC.”</span> <em>Statistics and Computing</em> 27 (5): 1413–32.
 </div>
 </div>
 </section>
