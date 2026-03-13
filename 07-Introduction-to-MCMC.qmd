@@ -308,6 +308,7 @@ get_prior(vowel.dur ~ 1,
 
 ```{r first_brm}
 #| cache: true
+#| message: false
 
 normal_fit <- brm(vowel.dur ~ 1, 
                   data = vowel_data,
