@@ -219,21 +219,7 @@ $$\log\left(\frac{y_j}{y_i}\right) = \beta_1\times \log\left(\frac{x_j}{x_i}\rig
 
 $$\frac{y_j}{y_i}= \left(\frac{x_j}{x_i}\right) ^ {\beta_1}$$
 
-Т. е. $y$ увеличится на $\beta_1$ процентов, если $x$ увеличится на 1 процент.
-
-### Сравнение моделей
-
-В работах [@vehtari2017; @vehtari2024] описан метод `loo`, который оценивает leave-one-out кроссвалидацию, которую можно использовать для сравнения моделей.
-
-```{r}
-fit1 <- add_criterion(fit1, "loo")
-fit1$criteria$loo
-fit2 <- add_criterion(fit2, "loo")
-fit2$criteria$loo
-loo_compare(fit1, fit2, criterion = "loo")
-```
-
-Большее значение ELPD стоит интепретировать как лучшую предсказательную способность модели. Подробнее про эту метрику можно прочитать, запустив `help('pareto-k-diagnostic')`. Еще больше на [странице пакета `loo`](https://mc-stan.org/loo/).
+Т. е. $y$ увеличится на $\beta_1$ процентов, если $x$ увеличится на 1 процент. Эта процентная логика будет работать при любой комбинации. Например, если $y$ не логорифмирован, а $x$ логорифмирован интерпретировать это стоит в той же логике: $y$ увеличится на $\beta_1$, если $x$ увеличится на 1 процент.
 
 ::: {.callout-note}
 В работе [@coretta2016] собраны [данные](https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/master/data/Coretta_2017_icelandic.csv) длительности исландских гласных. Используя байесовскую регрессию с априорными распределениями по умолчанию, смоделируйте длительность гласного (`vowel.dur`) в зависимости от придыхания (`aspiration`) у носителя `tt01`. Визуализируйте результаты модели.
@@ -275,6 +261,19 @@ vowels_fit |>
   plot()
 ```
 
+### Сравнение моделей
+
+В работах [@vehtari2017; @vehtari2024] описан метод `loo`, который оценивает leave-one-out кроссвалидацию, которую можно использовать для сравнения байесовских моделей.
+
+```{r}
+fit1 <- add_criterion(fit1, "loo")
+fit1$criteria$loo
+fit2 <- add_criterion(fit2, "loo")
+fit2$criteria$loo
+loo_compare(fit1, fit2, criterion = "loo")
+```
+
+Большее значение ELPD стоит интепретировать как лучшую предсказательную способность модели. Подробнее про эту метрику можно прочитать, запустив `help('pareto-k-diagnostic')`. Еще больше на [странице пакета `loo`](https://mc-stan.org/loo/).
 
 ## Категориальные переменные
 
@@ -462,7 +461,7 @@ fit_hierarchical <- brm(speech_tempo ~ (1|speaker),
                         prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0),
                                   prior(normal(2, 5), class = "sigma", lb = 0),
                                   prior(normal(2, 10), class = "sd")),
-                        iter = 3000,
+                        iter = 4000,
                         control = list(adapt_delta = .85))
 ```
 
@@ -544,7 +543,8 @@ fit_hierarchical_intercept <- brm(speech_tempo ~ I(log(n_vowels)) + (1|speaker),
                                   prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0),
                                             prior(normal(2, 5), class = "sigma", lb = 0),
                                             prior(normal(2, 10), class = "sd")),
-                                  iter = 3000,
+                                                              
+                                  iter = 4000,
                                   control = list(adapt_delta = .85))
 ```
 
@@ -583,8 +583,9 @@ fit_hierarchical_intercept_slope <- brm(speech_tempo ~ I(log(n_vowels)) + (I(log
                                   prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0),
                                             prior(normal(2, 5), class = "sigma", lb = 0),
                                             prior(normal(2, 10), class = "sd")),
-                                  iter = 3000,
+                                  iter = 4000,
                                   control = list(adapt_delta = .85))
+
 ```
 
 ```{r}
@@ -633,7 +634,7 @@ fit_hierarchical_slope <- brm(speech_tempo ~ I(log(n_vowels)) + (I(log(n_vowels)
                               prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0),
                                         prior(normal(2, 5), class = "sigma", lb = 0),
                                         prior(normal(2, 10), class = "sd")),
-                              iter = 3000,
+                              iter = 4000,
                               control = list(adapt_delta = .85))
 ```
 
