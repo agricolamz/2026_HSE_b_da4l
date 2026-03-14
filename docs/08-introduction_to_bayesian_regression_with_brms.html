@@ -271,12 +271,20 @@ window.Quarto = {
   <li><a href="#основы-регрессионного-анализа" id="toc-основы-регрессионного-анализа" class="nav-link active" data-scroll-target="#основы-регрессионного-анализа"><span class="header-section-number">8.1</span> Основы регрессионного анализа</a></li>
   <li><a href="#регрессионная-модель-в-brms" id="toc-регрессионная-модель-в-brms" class="nav-link" data-scroll-target="#регрессионная-модель-в-brms"><span class="header-section-number">8.2</span> Регрессионная модель в <code>brms</code></a></li>
   <li><a href="#альтернативная-модель" id="toc-альтернативная-модель" class="nav-link" data-scroll-target="#альтернативная-модель"><span class="header-section-number">8.3</span> Альтернативная модель</a></li>
-  <li><a href="#иерархические-модели" id="toc-иерархические-модели" class="nav-link" data-scroll-target="#иерархические-модели"><span class="header-section-number">8.4</span> Иерархические модели</a></li>
-  <li><a href="#другие-варианты-моделей-с-группировками" id="toc-другие-варианты-моделей-с-группировками" class="nav-link" data-scroll-target="#другие-варианты-моделей-с-группировками"><span class="header-section-number">8.5</span> Другие варианты моделей с группировками</a>
+  <li><a href="#категориальные-переменные" id="toc-категориальные-переменные" class="nav-link" data-scroll-target="#категориальные-переменные"><span class="header-section-number">8.4</span> Категориальные переменные</a>
   <ul class="collapse">
-  <li><a href="#complete-pooling-model" id="toc-complete-pooling-model" class="nav-link" data-scroll-target="#complete-pooling-model"><span class="header-section-number">8.5.1</span> Complete pooling model</a></li>
-  <li><a href="#no-pooling-model" id="toc-no-pooling-model" class="nav-link" data-scroll-target="#no-pooling-model"><span class="header-section-number">8.5.2</span> No pooling model</a></li>
+  <li><a href="#default-contrast-coding-treatment-contrasts" id="toc-default-contrast-coding-treatment-contrasts" class="nav-link" data-scroll-target="#default-contrast-coding-treatment-contrasts"><span class="header-section-number">8.4.1</span> Default contrast coding: Treatment contrasts</a></li>
+  <li><a href="#sum-contrasts" id="toc-sum-contrasts" class="nav-link" data-scroll-target="#sum-contrasts"><span class="header-section-number">8.4.2</span> Sum contrasts</a></li>
+  <li><a href="#one-hot-encoding" id="toc-one-hot-encoding" class="nav-link" data-scroll-target="#one-hot-encoding"><span class="header-section-number">8.4.3</span> One-hot encoding</a></li>
+  <li><a href="#другие-контрасты" id="toc-другие-контрасты" class="nav-link" data-scroll-target="#другие-контрасты"><span class="header-section-number">8.4.4</span> Другие контрасты</a></li>
   </ul></li>
+  <li><a href="#иерархические-модели" id="toc-иерархические-модели" class="nav-link" data-scroll-target="#иерархические-модели"><span class="header-section-number">8.5</span> Иерархические модели</a></li>
+  <li><a href="#другие-варианты-моделей-с-группировками" id="toc-другие-варианты-моделей-с-группировками" class="nav-link" data-scroll-target="#другие-варианты-моделей-с-группировками"><span class="header-section-number">8.6</span> Другие варианты моделей с группировками</a>
+  <ul class="collapse">
+  <li><a href="#complete-pooling-model" id="toc-complete-pooling-model" class="nav-link" data-scroll-target="#complete-pooling-model"><span class="header-section-number">8.6.1</span> Complete pooling model</a></li>
+  <li><a href="#no-pooling-model" id="toc-no-pooling-model" class="nav-link" data-scroll-target="#no-pooling-model"><span class="header-section-number">8.6.2</span> No pooling model</a></li>
+  </ul></li>
+  <li><a href="#модель-со-случайным-эффектом-добавляем-предикторы" id="toc-модель-со-случайным-эффектом-добавляем-предикторы" class="nav-link" data-scroll-target="#модель-со-случайным-эффектом-добавляем-предикторы"><span class="header-section-number">8.7</span> Модель со случайным эффектом: добавляем предикторы</a></li>
   </ul>
 </nav>
     </div>
@@ -615,8 +623,219 @@ fit1 -98.0      10.4  </code></pre>
 </div>
 </div>
 </section>
-<section id="иерархические-модели" class="level2" data-number="8.4">
-<h2 data-number="8.4" class="anchored" data-anchor-id="иерархические-модели"><span class="header-section-number">8.4</span> Иерархические модели</h2>
+<section id="категориальные-переменные" class="level2" data-number="8.4">
+<h2 data-number="8.4" class="anchored" data-anchor-id="категориальные-переменные"><span class="header-section-number">8.4</span> Категориальные переменные</h2>
+<section id="default-contrast-coding-treatment-contrasts" class="level3" data-number="8.4.1">
+<h3 data-number="8.4.1" class="anchored" data-anchor-id="default-contrast-coding-treatment-contrasts"><span class="header-section-number">8.4.1</span> Default contrast coding: Treatment contrasts</h3>
+<p>Чтобы добавить категориальную переменную в регрессионный анализ, она должна подвергнуться некоторому преобразованию. Существует несколько методов, которые позволяют это сделать, байесовский подход лишь заставляет нас помнить, что к чему, чтобы можно было адаптировать априорные распределения. Выше мы уже рассматривали задачу, где была построена модель, предсказывающая длительность гласного на основе придыхания предыдущего согласного.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Как этот график соотносится с оценками параметров модели?</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Мы видим, что свободный член (<code>b_Intercept</code>) соотносится с отсутствием придыхания, а переменная <code>b_aspirationyes</code> с разницей средних между случаев с придыханием и без. Дело в том, что когда запускается регрессию с категориальной переменной, данная переменная автоматически разбивается на группу бинарных dummy-переменных:</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">aspiration</th>
+<th style="text-align: right;">dummy_aspiration_no</th>
+<th style="text-align: right;">dummy_aspiration_yes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">без придыхания</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">с придыханием</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Дальше для регрессионного анализа выкидывают одну из переменных, так как иначе модель не сойдется (dummy-переменных всегда n-1, где n — количество категорий в переменной).</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">aspiration</th>
+<th style="text-align: right;">dummy_aspiration_yes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">без придыхания</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">с придыханием</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Если переменная <code>dummy_aspiration_yes</code> принимает значение 1, значит речь о случаях, где согласный придыхательный, а если принимает значение 0, то о случаях, где согласный непридыхательный. Если вставить нашу переменную в регрессионную формулу получится следующее:</p>
+<p><span class="math display">\[y_i = \hat\beta_0 + \hat\beta_1 \times \text{dummy-aspiration-yes} + \epsilon_i,\]</span></p>
+<p>Так как <code>dummy_aspiration_yes</code> принимает либо значение 1, либо значение 0, то получается, что модель предсказывает лишь два значения:</p>
+<p><span class="math display">\[y_i = \left\{\begin{array}{ll}\hat\beta_0 + \hat\beta_1 \times 1 + \epsilon_i = \hat\beta_0 + \hat\beta_1 + \epsilon_i\text{, если предыдущий согласный придыхательный}\\
+\hat\beta_0 + \hat\beta_1 \times 0 + \epsilon_i = \hat\beta_0 + \epsilon_i\text{, если предыдущий согласный непридыхательный}
+\end{array}\right.\]</span></p>
+<p>Таким образом, получается, что свободный член <span class="math inline">\(\beta_0\)</span> и угловой коэффициент <span class="math inline">\(\beta_1\)</span> в регрессии с категориальной переменной получает другую интерпретацию. Одно из значений переменной кодируется при помощи <span class="math inline">\(\beta_0\)</span>, а сумма коэффициентов <span class="math inline">\(\beta_0+\beta_1\)</span> дают другое значение переменной. Так что <span class="math inline">\(\beta_1\)</span> — это разница между оценками средних двух значений переменной.</p>
+<p>В случаях, когда значений больше — логика будет та же: будет создаваться n-1 dummy переменных, каждый коэффициент при таких переменных будет говорить о разнице средних переменной и некоторого, выделенного в интерсепт значения, которое становится таким эталоном сравнения. Автоматическая процедура отправляет в эталон сравнения уровень, название которого раньше по алфавиту. Если хочется выбрать другой эталон сравнения, то можно использовать функцию <code>factor()</code> и эксплицитно задать уровни или же использовать функцию <code>fct_relevel(your_variable, "make me  the baseline")</code> из пакета <code>forcats</code> (часть <code>tidyverse</code>).</p>
+</section>
+<section id="sum-contrasts" class="level3" data-number="8.4.2">
+<h3 data-number="8.4.2" class="anchored" data-anchor-id="sum-contrasts"><span class="header-section-number">8.4.2</span> Sum contrasts</h3>
+<p>Существует и другая стратегия моделирования с категориальной переменной, которая позволяет вернуть логику числовых предикторов, согласно которой интерсепт моделирует среднее значение переменной, а коэффициент при категориальной переменной говорит об изменении в предсказываемой переменной, при изменении категориальной переменной.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/master/data/Coretta_2017_icelandic.csv"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(speaker <span class="sc">==</span> <span class="st">"tt01"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">aspiration =</span> <span class="fu">factor</span>(aspiration)) <span class="ot">-&gt;</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  vowels</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(vowels<span class="sc">$</span>aspiration)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    yes
+no    0
+yes   1</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(vowels<span class="sc">$</span>aspiration) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">get_prior</span>(vowel.dur <span class="sc">~</span> aspiration,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">data =</span> vowels)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["prior"],"name":[1],"type":["chr"],"align":["left"]},{"label":["class"],"name":[2],"type":["chr"],"align":["left"]},{"label":["coef"],"name":[3],"type":["chr"],"align":["left"]},{"label":["group"],"name":[4],"type":["chr"],"align":["left"]},{"label":["resp"],"name":[5],"type":["chr"],"align":["left"]},{"label":["dpar"],"name":[6],"type":["chr"],"align":["left"]},{"label":["nlpar"],"name":[7],"type":["chr"],"align":["left"]},{"label":["lb"],"name":[8],"type":["chr"],"align":["left"]},{"label":["ub"],"name":[9],"type":["chr"],"align":["left"]},{"label":["tag"],"name":[10],"type":["chr"],"align":["left"]},{"label":["source"],"name":[11],"type":["chr"],"align":["left"]}],"data":[{"1":"","2":"b","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"default"},{"1":"","2":"b","3":"aspiration1","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"default"},{"1":"student_t(3, 86.8, 17.7)","2":"Intercept","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"default"},{"1":"student_t(3, 0, 17.7)","2":"sigma","3":"","4":"","5":"","6":"","7":"","8":"0","9":"","10":"","11":"default"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(vowels_fit2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>vowels_fit2 <span class="sc">|&gt;</span> </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conditional_effects</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-22-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Мы видим, что графики эффектов идентичны, однако графики коэффециентов разные, потому что эффекты теперь закодированы не друг относительно друга, а как некоторое средние между группами <span class="math inline">\(\pm\)</span> некоторое значение, отраженное в коэффициенте <span class="math inline">\(\hat\beta_1\)</span> (в нашем случае, если выразить все при помощи средних — 89.38 <span class="math inline">\(\pm\)</span> 11.18)</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>vowels_fit2</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Family: gaussian 
+  Links: mu = identity 
+Formula: vowel.dur ~ aspiration 
+   Data: vowels (Number of observations: 175) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Regression Coefficients:
+            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept      89.41      1.67    86.18    92.79 1.00     3304     2441
+aspiration1   -11.15      1.70   -14.57    -7.89 1.00     4192     2644
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma    22.39      1.24    20.12    24.95 1.00     3761     2986
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
+</div>
+</div>
+</section>
+<section id="one-hot-encoding" class="level3" data-number="8.4.3">
+<h3 data-number="8.4.3" class="anchored" data-anchor-id="one-hot-encoding"><span class="header-section-number">8.4.3</span> One-hot encoding</h3>
+<p>Существует еще одна стратегия: оставить все dummy-переменные и убрать случайный член, тогда регрессия будет оценивать каждый уровень переменной, создавая для него отдельный коэффициент.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(vowels_fit3)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>vowels_fit3 <span class="sc">|&gt;</span> </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conditional_effects</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-24-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>vowels_fit3</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Family: gaussian 
+  Links: mu = identity 
+Formula: vowel.dur ~ -1 + aspiration 
+   Data: vowels (Number of observations: 175) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Regression Coefficients:
+              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+aspirationno    100.57      2.30    95.96   105.12 1.00     4213     3046
+aspirationyes    78.28      2.35    73.68    82.80 1.00     4815     3110
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma    22.36      1.18    20.25    24.82 1.00     4453     2701
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
+</div>
+</div>
+<p>Использование данной стратегии имеет свой недостаток: у нас исчезают переменные, сравнивающие группы, так что мы не можем проанализировав коэффициенты что-то понять про наличие разницы между ними.</p>
+</section>
+<section id="другие-контрасты" class="level3" data-number="8.4.4">
+<h3 data-number="8.4.4" class="anchored" data-anchor-id="другие-контрасты"><span class="header-section-number">8.4.4</span> Другие контрасты</h3>
+<ul>
+<li>Repeated contrasts: контрасты для анализа упорядоченных переменных (например, образование, возраст и т. п.)</li>
+<li>Helmert contrasts: первый контрсат сравнивает между уровнями L1 и L2, следующий сравнивает уровне L3 и средние между (L1 и L2), следующий сравнивает L4 и среднее между (L1, L2 и L3) и т. д.</li>
+<li>и другие</li>
+</ul>
+</section>
+</section>
+<section id="иерархические-модели" class="level2" data-number="8.5">
+<h2 data-number="8.5" class="anchored" data-anchor-id="иерархические-модели"><span class="header-section-number">8.5</span> Иерархические модели</h2>
 <p>Одним из важных предположений регрессионного анализа является независимость наблюдений друг от друга. Однако часто в данных можно встретить различные группировки наблюдений, которые следует учитывать. В статистическом моделировании принято различать разные методы для борьбы с независимостью наблюдений. Во-первых, группировку можно разметить и добавить в основные эффекты регрессии. Если эта группировка как-то важна для исследования, то оценка параметров такого варьирования будет иметь смысл. Однако бывают такого рода группировки, которые нам неинтересно вставлять в основные эффекты регрессии: нам хочется сделать обобщение внутри группировки, а потом построить обобщение над обобщениями. Использование такого рода модель позволяет</p>
 <ul>
 <li>признать, что в данных есть нарушение независимости наблюдений друг от друга;</li>
@@ -641,13 +860,13 @@ fit1 -98.0      10.4  </code></pre>
 </div>
 <p>В заданиях выше, когда мы предсказывали скорость речи, мы все время отфильтровывали одного конкретного носителя и делали модель для него. Это связано с тем, что носитель — это образцовый пример случайного эффекта. Давайте теперь попробуем смоделировать скорость речи для всех носителей из звинигородского корпуса</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/data/speech_tempo_zvenigorod.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/data/speech_tempo_zvenigorod.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Случайные эффекты записываются в круглых скобках. Почему перед ним тоже нужно писать 1 (что означает интерсепт) станет ясно из примеров ниже. Давайте сравним априорные распределения по-умолчанию, которые предлагает <code>brms</code> для моделей со смешанными эффектами и для моделей без них:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_prior</span>(speech_tempo <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">data =</span> df,</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">family =</span> <span class="fu">gaussian</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_prior</span>(speech_tempo <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">data =</span> df,</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">family =</span> <span class="fu">gaussian</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -655,9 +874,9 @@ fit1 -98.0      10.4  </code></pre>
   </script>
 </div>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_prior</span>(speech_tempo <span class="sc">~</span> (<span class="dv">1</span><span class="sc">|</span>speaker),</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">data =</span> df,</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">family =</span> <span class="fu">gaussian</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_prior</span>(speech_tempo <span class="sc">~</span> (<span class="dv">1</span><span class="sc">|</span>speaker),</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">data =</span> df,</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">family =</span> <span class="fu">gaussian</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -668,69 +887,59 @@ fit1 -98.0      10.4  </code></pre>
 </div>
 <p>Как видно добавились много параметров <code>sd</code>, которыми принято обозначать параметры вариативности модели внутри групп, в то время как <code>sigma</code> продолжает быть параметром, определяющим вариативность между группами.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> (<span class="dv">1</span><span class="sc">|</span>speaker),</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">data =</span> df,</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">cores =</span> n_cores,</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">silent =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>                        <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="fl">5.31</span>, <span class="fl">1.93</span>), <span class="at">class =</span> <span class="st">"Intercept"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">5</span>), <span class="at">class =</span> <span class="st">"sigma"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">10</span>), <span class="at">class =</span> <span class="st">"sd"</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: There were 3 divergent transitions after warmup. See
-https://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
-to find out why this is a problem and how to eliminate them.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Examine the pairs() plot to diagnose sampling problems</code></pre>
-</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> (<span class="dv">1</span><span class="sc">|</span>speaker),</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">data =</span> df,</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">cores =</span> n_cores,</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">silent =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>                        <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="fl">5.31</span>, <span class="fl">1.93</span>), <span class="at">class =</span> <span class="st">"Intercept"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">5</span>), <span class="at">class =</span> <span class="st">"sigma"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">10</span>), <span class="at">class =</span> <span class="st">"sd"</span>)),</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>                        <span class="at">iter =</span> <span class="dv">3000</span>,</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>                        <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> .<span class="dv">85</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: There were 3 divergent transitions after warmup. Increasing
-adapt_delta above 0.8 may help. See
-http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</code></pre>
-</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> Family: gaussian 
   Links: mu = identity 
 Formula: speech_tempo ~ (1 | speaker) 
    Data: df (Number of observations: 5623) 
-  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
-         total post-warmup draws = 4000
+  Draws: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
+         total post-warmup draws = 6000
 
 Multilevel Hyperparameters:
 ~speaker (Number of levels: 9) 
               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sd(Intercept)     0.87      0.27     0.52     1.56 1.00      626      949
+sd(Intercept)     0.89      0.30     0.52     1.67 1.00      851     1063
 
 Regression Coefficients:
           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-Intercept     4.57      0.30     3.91     5.17 1.01      656      754
+Intercept     4.58      0.30     3.95     5.15 1.00      871      977
 
 Further Distributional Parameters:
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sigma     1.38      0.01     1.35     1.40 1.00     1935     1552
+sigma     1.38      0.01     1.35     1.40 1.00     2366     2257
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
 scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_hierarchical)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_hierarchical)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+<p>В случаях, когда у нас нет предикторов, визуализация параметров иллюстрирует необходимые распределения.</p>
 </section>
-<section id="другие-варианты-моделей-с-группировками" class="level2" data-number="8.5">
-<h2 data-number="8.5" class="anchored" data-anchor-id="другие-варианты-моделей-с-группировками"><span class="header-section-number">8.5</span> Другие варианты моделей с группировками</h2>
-<section id="complete-pooling-model" class="level3" data-number="8.5.1">
-<h3 data-number="8.5.1" class="anchored" data-anchor-id="complete-pooling-model"><span class="header-section-number">8.5.1</span> Complete pooling model</h3>
+<section id="другие-варианты-моделей-с-группировками" class="level2" data-number="8.6">
+<h2 data-number="8.6" class="anchored" data-anchor-id="другие-варианты-моделей-с-группировками"><span class="header-section-number">8.6</span> Другие варианты моделей с группировками</h2>
+<section id="complete-pooling-model" class="level3" data-number="8.6.1">
+<h3 data-number="8.6.1" class="anchored" data-anchor-id="complete-pooling-model"><span class="header-section-number">8.6.1</span> Complete pooling model</h3>
 <div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -742,14 +951,14 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>fit_complete_pooling <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">data =</span> df,</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">cores =</span> n_cores,</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>                            <span class="at">silent =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>fit_complete_pooling <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">data =</span> df,</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">cores =</span> n_cores,</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>                            <span class="at">silent =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>fit_complete_pooling</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>fit_complete_pooling</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> Family: gaussian 
   Links: mu = identity 
@@ -770,18 +979,18 @@ Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
 scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_complete_pooling)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_complete_pooling)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="no-pooling-model" class="level3" data-number="8.5.2">
-<h3 data-number="8.5.2" class="anchored" data-anchor-id="no-pooling-model"><span class="header-section-number">8.5.2</span> No pooling model</h3>
+<section id="no-pooling-model" class="level3" data-number="8.6.2">
+<h3 data-number="8.6.2" class="anchored" data-anchor-id="no-pooling-model"><span class="header-section-number">8.6.2</span> No pooling model</h3>
 <div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -793,16 +1002,16 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>fit_no_pooling <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> speaker,</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">data =</span> df,</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">cores =</span> n_cores,</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>                      <span class="at">silent =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">5</span>), <span class="at">class =</span> <span class="st">"sigma"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">class =</span> <span class="st">"b"</span>, <span class="at">lb =</span> <span class="dv">0</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>fit_no_pooling <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> speaker,</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">data =</span> df,</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">cores =</span> n_cores,</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>                      <span class="at">silent =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">5</span>), <span class="at">class =</span> <span class="st">"sigma"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">class =</span> <span class="st">"b"</span>, <span class="at">lb =</span> <span class="dv">0</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>fit_no_pooling</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>fit_no_pooling</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> Family: gaussian 
   Links: mu = identity 
@@ -831,22 +1040,26 @@ Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
 scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_no_pooling)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_no_pooling)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-24-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-32-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+</section>
+</section>
+<section id="модель-со-случайным-эффектом-добавляем-предикторы" class="level2" data-number="8.7">
+<h2 data-number="8.7" class="anchored" data-anchor-id="модель-со-случайным-эффектом-добавляем-предикторы"><span class="header-section-number">8.7</span> Модель со случайным эффектом: добавляем предикторы</h2>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
@@ -866,7 +1079,6 @@ Vehtari, Aki, Andrew Gelman, and Jonah Gabry. 2017. <span>“Practical Bayesian 
 Vehtari, Aki, Daniel Simpson, Andrew Gelman, Yuling Yao, and Jonah Gabry. 2024. <span>“Pareto Smoothed Importance Sampling.”</span> <em>Journal of Machine Learning Research</em> 25 (72): 1–58.
 </div>
 </div>
-</section>
 </section>
 
 </main> <!-- /main -->
