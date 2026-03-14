@@ -201,6 +201,28 @@ fit2 |>
   pp_check(type = "stat")
 ```
 
+Как интерпретировать полученную регрессию с двумя отлогорифмированными значениями?
+
+В обычной линейной регресии мы узнаем отношения между $x$ и  $y$:
+$$y_i = \beta_0+\beta_1\times x_i$$
+
+Как изменится $y_j$, если мы увеличем $x_i + 1 = x_j$?
+$$y_j = \beta_0+\beta_1\times x_j$$
+
+$$y_j - y_i = \beta_0+\beta_1\times x_j - (\beta_0+\beta_1\times x_i)  = \beta_1(x_j - x_i)$$
+
+Т. е. $y$ увеличится на $\beta_1$ , если $x$ увеличится на 1. Что же будет с логарифмированными переменными? Как изменится $y_j$, если мы увеличем $x_i + 1 = x_j$?
+
+$$\log(y_j) - \log(y_i) = \beta_1\times (\log(x_j) - \log(x_i))$$
+
+$$\log\left(\frac{y_j}{y_i}\right) = \beta_1\times \log\left(\frac{x_j}{x_i}\right) = \log\left(\left(\frac{x_j}{x_i}\right) ^ {\beta_1}\right)$$
+
+$$\frac{y_j}{y_i}= \left(\frac{x_j}{x_i}\right) ^ {\beta_1}$$
+
+Т. е. $y$ увеличится на $\beta_1$ процентов, если $x$ увеличится на 1 процент.
+
+### Сравнение моделей
+
 В работах [@vehtari2017; @vehtari2024] описан метод `loo`, который оценивает leave-one-out кроссвалидацию, которую можно использовать для сравнения моделей.
 
 ```{r}
@@ -510,3 +532,129 @@ plot(fit_no_pooling)
 
 ## Модель со случайным эффектом: добавляем предикторы
 
+```{r hierarchical-intercept}
+#| cache: true
+#| message: false
+
+fit_hierarchical_intercept <- brm(speech_tempo ~ I(log(n_vowels)) + (1|speaker),
+                                  data = df,
+                                  family = gaussian(),
+                                  cores = n_cores,
+                                  silent = TRUE,
+                                  prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0),
+                                            prior(normal(2, 5), class = "sigma", lb = 0),
+                                            prior(normal(2, 10), class = "sd")),
+                                  iter = 3000,
+                                  control = list(adapt_delta = .85))
+```
+
+```{r}
+fit_hierarchical_intercept
+
+plot(fit_hierarchical_intercept)
+
+fit_hierarchical_intercept |> 
+  conditional_effects() |> 
+  plot(points = TRUE)
+```
+
+Cлучайные члены для каждого носителя
+
+```{r}
+ranef(fit_hierarchical_intercept)$speaker[,,"Intercept"] |> 
+  as.data.frame() |> 
+  rownames_to_column("speaker") |> 
+  ggplot(aes(y = speaker, x = Estimate)) +
+  geom_errorbar(aes(xmin = `Q2.5`, xmax = `Q97.5`))+
+  geom_vline(xintercept = 0, linetype = 2) +
+  geom_point()
+```
+
+
+```{r hierarchical-intercept-slope}
+#| cache: true
+#| message: false
+
+fit_hierarchical_intercept_slope <- brm(speech_tempo ~ I(log(n_vowels)) + (I(log(n_vowels)) + 1|speaker),
+                                  data = df,
+                                  family = gaussian(),
+                                  cores = n_cores,
+                                  silent = TRUE,
+                                  prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0),
+                                            prior(normal(2, 5), class = "sigma", lb = 0),
+                                            prior(normal(2, 10), class = "sd")),
+                                  iter = 3000,
+                                  control = list(adapt_delta = .85))
+```
+
+```{r}
+fit_hierarchical_intercept_slope
+
+plot(fit_hierarchical_intercept_slope)
+
+fit_hierarchical_intercept_slope |> 
+  conditional_effects() |> 
+  plot(points = TRUE)
+```
+
+Cлучайные члены для каждого носителя
+
+```{r}
+ranef(fit_hierarchical_intercept_slope)$speaker[,,"Intercept"] |> 
+  as.data.frame() |> 
+  rownames_to_column("speaker") |> 
+  ggplot(aes(y = speaker, x = Estimate)) +
+  geom_errorbar(aes(xmin = `Q2.5`, xmax = `Q97.5`))+
+  geom_vline(xintercept = 0, linetype = 2) +
+  geom_point()
+```
+
+Угловой кэффициент для каждого носителя
+
+```{r}
+ranef(fit_hierarchical_intercept_slope)$speaker[,,"Ilogn_vowels"] |> 
+  as.data.frame() |> 
+  rownames_to_column("speaker") |> 
+  ggplot(aes(y = speaker, x = Estimate)) +
+  geom_errorbar(aes(xmin = `Q2.5`, xmax = `Q97.5`))+
+  geom_vline(xintercept = 0, linetype = 2) +
+  geom_point()
+```
+
+```{r hierarchical-slope}
+#| cache: true
+#| message: false
+
+fit_hierarchical_slope <- brm(speech_tempo ~ I(log(n_vowels)) + (I(log(n_vowels)) + 0|speaker),
+                              data = df,
+                              family = gaussian(),
+                              cores = n_cores,
+                              silent = TRUE,
+                              prior = c(prior(normal(5.31, 1.93), class = "Intercept", lb = 0),
+                                        prior(normal(2, 5), class = "sigma", lb = 0),
+                                        prior(normal(2, 10), class = "sd")),
+                              iter = 3000,
+                              control = list(adapt_delta = .85))
+```
+
+```{r}
+fit_hierarchical_slope
+
+plot(fit_hierarchical_slope)
+
+fit_hierarchical_slope |> 
+  conditional_effects() |> 
+  plot(points = TRUE)
+```
+
+Угловой кэффициент для каждого носителя
+
+```{r}
+ranef(fit_hierarchical_slope)$speaker[,,"Ilogn_vowels"] |> 
+  as.data.frame() |> 
+  rownames_to_column("speaker") |> 
+  ggplot(aes(y = speaker, x = Estimate)) +
+  geom_errorbar(aes(xmin = `Q2.5`, xmax = `Q97.5`))+
+  geom_vline(xintercept = 0, linetype = 2) +
+  geom_point()
+```

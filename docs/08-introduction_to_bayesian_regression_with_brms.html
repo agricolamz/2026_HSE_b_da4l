@@ -270,7 +270,10 @@ window.Quarto = {
   <ul>
   <li><a href="#основы-регрессионного-анализа" id="toc-основы-регрессионного-анализа" class="nav-link active" data-scroll-target="#основы-регрессионного-анализа"><span class="header-section-number">8.1</span> Основы регрессионного анализа</a></li>
   <li><a href="#регрессионная-модель-в-brms" id="toc-регрессионная-модель-в-brms" class="nav-link" data-scroll-target="#регрессионная-модель-в-brms"><span class="header-section-number">8.2</span> Регрессионная модель в <code>brms</code></a></li>
-  <li><a href="#альтернативная-модель" id="toc-альтернативная-модель" class="nav-link" data-scroll-target="#альтернативная-модель"><span class="header-section-number">8.3</span> Альтернативная модель</a></li>
+  <li><a href="#альтернативная-модель" id="toc-альтернативная-модель" class="nav-link" data-scroll-target="#альтернативная-модель"><span class="header-section-number">8.3</span> Альтернативная модель</a>
+  <ul class="collapse">
+  <li><a href="#сравнение-моделей" id="toc-сравнение-моделей" class="nav-link" data-scroll-target="#сравнение-моделей"><span class="header-section-number">8.3.1</span> Сравнение моделей</a></li>
+  </ul></li>
   <li><a href="#категориальные-переменные" id="toc-категориальные-переменные" class="nav-link" data-scroll-target="#категориальные-переменные"><span class="header-section-number">8.4</span> Категориальные переменные</a>
   <ul class="collapse">
   <li><a href="#default-contrast-coding-treatment-contrasts" id="toc-default-contrast-coding-treatment-contrasts" class="nav-link" data-scroll-target="#default-contrast-coding-treatment-contrasts"><span class="header-section-number">8.4.1</span> Default contrast coding: Treatment contrasts</a></li>
@@ -552,6 +555,17 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
 </div>
 </div>
+<p>Как интерпретировать полученную регрессию с двумя отлогорифмированными значениями?</p>
+<p>В обычной линейной регресии мы узнаем отношения между <span class="math inline">\(x\)</span> и <span class="math inline">\(y\)</span>: <span class="math display">\[y_i = \beta_0+\beta_1\times x_i\]</span></p>
+<p>Как изменится <span class="math inline">\(y_j\)</span>, если мы увеличем <span class="math inline">\(x_i + 1 = x_j\)</span>? <span class="math display">\[y_j = \beta_0+\beta_1\times x_j\]</span></p>
+<p><span class="math display">\[y_j - y_i = \beta_0+\beta_1\times x_j - (\beta_0+\beta_1\times x_i)  = \beta_1(x_j - x_i)\]</span></p>
+<p>Т. е. <span class="math inline">\(y\)</span> увеличится на <span class="math inline">\(\beta_1\)</span> , если <span class="math inline">\(x\)</span> увеличится на 1. Что же будет с логарифмированными переменными? Как изменится <span class="math inline">\(y_j\)</span>, если мы увеличем <span class="math inline">\(x_i + 1 = x_j\)</span>?</p>
+<p><span class="math display">\[\log(y_j) - \log(y_i) = \beta_1\times (\log(x_j) - \log(x_i))\]</span></p>
+<p><span class="math display">\[\log\left(\frac{y_j}{y_i}\right) = \beta_1\times \log\left(\frac{x_j}{x_i}\right) = \log\left(\left(\frac{x_j}{x_i}\right) ^ {\beta_1}\right)\]</span></p>
+<p><span class="math display">\[\frac{y_j}{y_i}= \left(\frac{x_j}{x_i}\right) ^ {\beta_1}\]</span></p>
+<p>Т. е. <span class="math inline">\(y\)</span> увеличится на <span class="math inline">\(\beta_1\)</span> процентов, если <span class="math inline">\(x\)</span> увеличится на 1 процент.</p>
+<section id="сравнение-моделей" class="level3" data-number="8.3.1">
+<h3 data-number="8.3.1" class="anchored" data-anchor-id="сравнение-моделей"><span class="header-section-number">8.3.1</span> Сравнение моделей</h3>
 <p>В работах <span class="citation" data-cites="vehtari2017 vehtari2024">(<a href="#ref-vehtari2017" role="doc-biblioref">Vehtari et al. 2017</a>, <a href="#ref-vehtari2024" role="doc-biblioref">2024</a>)</span> описан метод <code>loo</code>, который оценивает leave-one-out кроссвалидацию, которую можно использовать для сравнения моделей.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">add_criterion</span>(fit1, <span class="st">"loo"</span>)</span>
@@ -622,6 +636,7 @@ fit1 -98.0      10.4  </code></pre>
 </div>
 </div>
 </div>
+</section>
 </section>
 <section id="категориальные-переменные" class="level2" data-number="8.4">
 <h2 data-number="8.4" class="anchored" data-anchor-id="категориальные-переменные"><span class="header-section-number">8.4</span> Категориальные переменные</h2>
@@ -1060,6 +1075,304 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </section>
 <section id="модель-со-случайным-эффектом-добавляем-предикторы" class="level2" data-number="8.7">
 <h2 data-number="8.7" class="anchored" data-anchor-id="модель-со-случайным-эффектом-добавляем-предикторы"><span class="header-section-number">8.7</span> Модель со случайным эффектом: добавляем предикторы</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical_intercept <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> <span class="fu">I</span>(<span class="fu">log</span>(n_vowels)) <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>speaker),</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">data =</span> df,</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">cores =</span> n_cores,</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">silent =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="fl">5.31</span>, <span class="fl">1.93</span>), <span class="at">class =</span> <span class="st">"Intercept"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>                                            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">5</span>), <span class="at">class =</span> <span class="st">"sigma"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>                                            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">10</span>), <span class="at">class =</span> <span class="st">"sd"</span>)),</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">iter =</span> <span class="dv">3000</span>,</span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> .<span class="dv">85</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical_intercept</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Family: gaussian 
+  Links: mu = identity 
+Formula: speech_tempo ~ I(log(n_vowels)) + (1 | speaker) 
+   Data: df (Number of observations: 5623) 
+  Draws: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
+         total post-warmup draws = 6000
+
+Multilevel Hyperparameters:
+~speaker (Number of levels: 9) 
+              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sd(Intercept)     0.80      0.25     0.48     1.44 1.00     1161     1581
+
+Regression Coefficients:
+             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept        1.91      0.27     1.39     2.47 1.01     1037     1334
+Ilogn_vowels     1.14      0.02     1.10     1.18 1.00     3666     2233
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     1.09      0.01     1.07     1.11 1.00     3574     3066
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_hierarchical_intercept)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical_intercept <span class="sc">|&gt;</span> </span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conditional_effects</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="at">points =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-33-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Cлучайные члены для каждого носителя</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ranef</span>(fit_hierarchical_intercept)<span class="sc">$</span>speaker[,,<span class="st">"Intercept"</span>] <span class="sc">|&gt;</span> </span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"speaker"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> speaker, <span class="at">x =</span> Estimate)) <span class="sc">+</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> <span class="st">`</span><span class="at">Q2.5</span><span class="st">`</span>, <span class="at">xmax =</span> <span class="st">`</span><span class="at">Q97.5</span><span class="st">`</span>))<span class="sc">+</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical_intercept_slope <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> <span class="fu">I</span>(<span class="fu">log</span>(n_vowels)) <span class="sc">+</span> (<span class="fu">I</span>(<span class="fu">log</span>(n_vowels)) <span class="sc">+</span> <span class="dv">1</span><span class="sc">|</span>speaker),</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">data =</span> df,</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">cores =</span> n_cores,</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">silent =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="fl">5.31</span>, <span class="fl">1.93</span>), <span class="at">class =</span> <span class="st">"Intercept"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>                                            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">5</span>), <span class="at">class =</span> <span class="st">"sigma"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>                                            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">10</span>), <span class="at">class =</span> <span class="st">"sd"</span>)),</span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">iter =</span> <span class="dv">3000</span>,</span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> .<span class="dv">85</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: There were 9 divergent transitions after warmup. See
+https://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
+to find out why this is a problem and how to eliminate them.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Examine the pairs() plot to diagnose sampling problems</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical_intercept_slope</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: There were 9 divergent transitions after warmup. Increasing
+adapt_delta above 0.85 may help. See
+http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Family: gaussian 
+  Links: mu = identity 
+Formula: speech_tempo ~ I(log(n_vowels)) + (I(log(n_vowels)) + 1 | speaker) 
+   Data: df (Number of observations: 5623) 
+  Draws: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
+         total post-warmup draws = 6000
+
+Multilevel Hyperparameters:
+~speaker (Number of levels: 9) 
+                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+sd(Intercept)                   0.96      0.33     0.55     1.78 1.00     1734
+sd(Ilogn_vowels)                0.17      0.07     0.08     0.34 1.00     1711
+cor(Intercept,Ilogn_vowels)    -0.33      0.33    -0.84     0.38 1.00     2683
+                            Tail_ESS
+sd(Intercept)                   1940
+sd(Ilogn_vowels)                2518
+cor(Intercept,Ilogn_vowels)     2965
+
+Regression Coefficients:
+             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept        1.84      0.33     1.19     2.53 1.00     1503     1745
+Ilogn_vowels     1.17      0.07     1.04     1.30 1.00     2252     2784
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     1.08      0.01     1.06     1.10 1.00     8724     4337
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_hierarchical_intercept_slope)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-35-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical_intercept_slope <span class="sc">|&gt;</span> </span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conditional_effects</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="at">points =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-35-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Cлучайные члены для каждого носителя</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ranef</span>(fit_hierarchical_intercept_slope)<span class="sc">$</span>speaker[,,<span class="st">"Intercept"</span>] <span class="sc">|&gt;</span> </span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"speaker"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> speaker, <span class="at">x =</span> Estimate)) <span class="sc">+</span></span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> <span class="st">`</span><span class="at">Q2.5</span><span class="st">`</span>, <span class="at">xmax =</span> <span class="st">`</span><span class="at">Q97.5</span><span class="st">`</span>))<span class="sc">+</span></span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Угловой кэффициент для каждого носителя</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ranef</span>(fit_hierarchical_intercept_slope)<span class="sc">$</span>speaker[,,<span class="st">"Ilogn_vowels"</span>] <span class="sc">|&gt;</span> </span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"speaker"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> speaker, <span class="at">x =</span> Estimate)) <span class="sc">+</span></span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> <span class="st">`</span><span class="at">Q2.5</span><span class="st">`</span>, <span class="at">xmax =</span> <span class="st">`</span><span class="at">Q97.5</span><span class="st">`</span>))<span class="sc">+</span></span>
+<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical_slope <span class="ot">&lt;-</span> <span class="fu">brm</span>(speech_tempo <span class="sc">~</span> <span class="fu">I</span>(<span class="fu">log</span>(n_vowels)) <span class="sc">+</span> (<span class="fu">I</span>(<span class="fu">log</span>(n_vowels)) <span class="sc">+</span> <span class="dv">0</span><span class="sc">|</span>speaker),</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>                              <span class="at">data =</span> df,</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>                              <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>                              <span class="at">cores =</span> n_cores,</span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>                              <span class="at">silent =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a>                              <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="fl">5.31</span>, <span class="fl">1.93</span>), <span class="at">class =</span> <span class="st">"Intercept"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a>                                        <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">5</span>), <span class="at">class =</span> <span class="st">"sigma"</span>, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a>                                        <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">10</span>), <span class="at">class =</span> <span class="st">"sd"</span>)),</span>
+<span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a>                              <span class="at">iter =</span> <span class="dv">3000</span>,</span>
+<span id="cb66-10"><a href="#cb66-10" aria-hidden="true" tabindex="-1"></a>                              <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> .<span class="dv">85</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Running /usr/lib/R/bin/R CMD SHLIB foo.c
+using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0’
+gcc -I"/usr/share/R/include" -DNDEBUG   -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/Rcpp/include/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/unsupported"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/BH/include" -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/StanHeaders/include/src/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/StanHeaders/include/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppParallel/include/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1       -fpic  -g -O2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=/build/r-base-FPSnzf/r-base-4.3.3=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=/build/r-base-FPSnzf/r-base-4.3.3=/usr/src/r-base-4.3.3-2build2 -Wdate-time -D_FORTIFY_SOURCE=3  -c foo.c -o foo.o
+In file included from /home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/Eigen/Core:19,
+                 from /home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/Eigen/Dense:1,
+                 from /home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22,
+                 from &lt;command-line&gt;:
+/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/Eigen/src/Core/util/Macros.h:679:10: fatal error: cmath: No such file or directory
+  679 | #include &lt;cmath&gt;
+      |          ^~~~~~~
+compilation terminated.
+make: *** [/usr/lib/R/etc/Makeconf:191: foo.o] Error 1</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: There were 6 divergent transitions after warmup. See
+https://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
+to find out why this is a problem and how to eliminate them.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Examine the pairs() plot to diagnose sampling problems</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical_slope</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: There were 6 divergent transitions after warmup. Increasing
+adapt_delta above 0.85 may help. See
+http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Family: gaussian 
+  Links: mu = identity 
+Formula: speech_tempo ~ I(log(n_vowels)) + (I(log(n_vowels)) + 0 | speaker) 
+   Data: df (Number of observations: 5623) 
+  Draws: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
+         total post-warmup draws = 6000
+
+Multilevel Hyperparameters:
+~speaker (Number of levels: 9) 
+                 Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sd(Ilogn_vowels)     0.31      0.10     0.18     0.55 1.01      808     1211
+
+Regression Coefficients:
+             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept        1.92      0.05     1.82     2.01 1.00     7818     4339
+Ilogn_vowels     1.14      0.11     0.93     1.37 1.01      762     1094
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     1.11      0.01     1.09     1.13 1.00     2466     2441
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_hierarchical_slope)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>fit_hierarchical_slope <span class="sc">|&gt;</span> </span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conditional_effects</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="at">points =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-38-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Угловой кэффициент для каждого носителя</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ranef</span>(fit_hierarchical_slope)<span class="sc">$</span>speaker[,,<span class="st">"Ilogn_vowels"</span>] <span class="sc">|&gt;</span> </span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"speaker"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> speaker, <span class="at">x =</span> Estimate)) <span class="sc">+</span></span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> <span class="st">`</span><span class="at">Q2.5</span><span class="st">`</span>, <span class="at">xmax =</span> <span class="st">`</span><span class="at">Q97.5</span><span class="st">`</span>))<span class="sc">+</span></span>
+<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
