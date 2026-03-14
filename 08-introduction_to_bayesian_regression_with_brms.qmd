@@ -125,7 +125,6 @@ knitr::include_graphics("images/bad_chains.png")
 knitr::include_graphics("images/bad_chains2.png")
 ```
 
-
 Метрики модели можно посмотреть, просто вызвав переменную с моделью.
 
 ```{r}
