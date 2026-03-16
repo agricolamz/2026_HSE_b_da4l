@@ -358,7 +358,6 @@ get_prior(vowel.dur ~ aspiration,
 
 
 ```{r vowels_fit2}
-#| include: false
 #| cache: true
 
 vowels_fit2 <- brm(vowel.dur ~ aspiration,
@@ -386,7 +385,6 @@ vowels_fit2
 Существует еще одна стратегия: оставить все dummy-переменные и убрать случайный член, тогда регрессия будет оценивать каждый уровень переменной, создавая для него отдельный коэффициент.
 
 ```{r vowels_fit3}
-#| include: false
 #| cache: true
 
 vowels_fit3 <- brm(vowel.dur ~ -1 + aspiration,
