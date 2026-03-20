@@ -731,7 +731,7 @@ fit1 -98.0      10.4  </code></pre>
 </section>
 <section id="sum-contrasts" class="level3" data-number="8.4.2">
 <h3 data-number="8.4.2" class="anchored" data-anchor-id="sum-contrasts"><span class="header-section-number">8.4.2</span> Sum contrasts</h3>
-<p>Существует и другая стратегия моделирования с категориальной переменной, которая позволяет вернуть логику числовых предикторов, согласно которой интерсепт моделирует среднее значение переменной, а коэффициент при категориальной переменной говорит об изменении в предсказываемой переменной, при изменении категориальной переменной.</p>
+<p>Существует и другая стратегия моделирования с категориальной переменной, которая позволяет вернуть логику числовых предикторов, согласно которой свободный член моделирует среднее значение переменной, а коэффициент при категориальной переменной говорит об изменении в предсказываемой переменной, при изменении категориальной переменной.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/agricolamz/2024_HSE_b_da4l/master/data/Coretta_2017_icelandic.csv"</span>) <span class="sc">|&gt;</span> </span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(speaker <span class="sc">==</span> <span class="st">"tt01"</span>) <span class="sc">|&gt;</span> </span>
@@ -1501,6 +1501,46 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
 </div>
 </div>
+<div class="callout callout-style-simple callout-note no-icon">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-body-container">
+<p>В работе <span class="citation" data-cites="ota2009">(<a href="#ref-ota2009" role="doc-biblioref">Ota et al. 2009</a>)</span> описывается эксперимент, в котором арабским и японским билингвам показывали английские слова и просили их определить, относятся ли они к одной семантической группе. В словах были в том числе и фонетически близкие слова, которые различаются фонемами, которых нет в L1. В <a href="https://raw.githubusercontent.com/agricolamz/2026_HSE_b_da4l/master/data/ota2009_key_rock.csv">датасет</a> записан фрагмент данных, в которых стимулы не связаны. Постройте регрессионную модель, предсказывающую время реакции (<code>Words.RT</code>) на основе того, верно ли испытуемый (<code>Subject</code>) выполнил задание (<code>Words.ACC</code>). Я использовал sum contrast.</p>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Running /usr/lib/R/bin/R CMD SHLIB foo.c
+using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0’
+gcc -I"/usr/share/R/include" -DNDEBUG   -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/Rcpp/include/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/unsupported"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/BH/include" -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/StanHeaders/include/src/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/StanHeaders/include/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppParallel/include/"  -I"/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1       -fpic  -g -O2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=/build/r-base-FPSnzf/r-base-4.3.3=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=/build/r-base-FPSnzf/r-base-4.3.3=/usr/src/r-base-4.3.3-2build2 -Wdate-time -D_FORTIFY_SOURCE=3  -c foo.c -o foo.o
+In file included from /home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/Eigen/Core:19,
+                 from /home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/Eigen/Dense:1,
+                 from /home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22,
+                 from &lt;command-line&gt;:
+/home/agricolamz/R/x86_64-pc-linux-gnu-library/4.3/RcppEigen/include/Eigen/src/Core/util/Macros.h:679:10: fatal error: cmath: No such file or directory
+  679 | #include &lt;cmath&gt;
+      |          ^~~~~~~
+compilation terminated.
+make: *** [/usr/lib/R/etc/Makeconf:191: foo.o] Error 1</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/ota2009-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-introduction_to_bayesian_regression_with_brms_files/figure-html/ota2009-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
@@ -1509,6 +1549,9 @@ Coretta, Stefano. 2016. <span>“Vowel Duration and Aspiration Effects in Icelan
 </div>
 <div id="ref-gelman92" class="csl-entry" role="listitem">
 Gelman, A., and D. B. Rubin. 1992. <span>“Inference from Iterative Simulation Using Multiple Sequences.”</span> <em>Statistical Science</em>, 457–72.
+</div>
+<div id="ref-ota2009" class="csl-entry" role="listitem">
+Ota, Mitsuhiko, Robert J. Hartsuiker, and Sarah L. Haywood. 2009. <span>“The KEY to the ROCK: Near-Homophony in Nonnative Visual Word Recognition.”</span> <em>Cognition</em> 111 (2): 263–69. https://doi.org/<a href="https://doi.org/10.1016/j.cognition.2008.12.007">https://doi.org/10.1016/j.cognition.2008.12.007</a>.
 </div>
 <div id="ref-stepanova11" class="csl-entry" role="listitem">
 Stepanova, S. 2011. <span>“Russian Spontaneous Speech Rate-Based on the <span>S</span>peech Corpus of <span>R</span>ussian Everyday Interaction.”</span> <em>ICPhS</em>, 1902–5.
